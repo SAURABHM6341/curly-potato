@@ -1,4 +1,4 @@
-# 🏛️ PCR Portal - Public Certificate Request Portal
+# 🏛️ PCR Portal - Protection of Civil Rights Portal
 
 <div align="center">
 
@@ -8,7 +8,7 @@
 ![License](https://img.shields.io/badge/license-Proprietary-red.svg)
 ![Status](https://img.shields.io/badge/status-Production%20Ready-success.svg)
 
-**A comprehensive MERN stack application for government certificate application and processing**
+**A comprehensive MERN stack application for Direct Benefit Transfer (DBT) under PCR/PoA Scheme**
 
 [Features](#-features) •
 [Quick Start](#-quick-start) •
@@ -22,74 +22,97 @@
 
 ## 📖 Overview
 
-The **PCR Portal** is a full-stack web application built on the MERN stack that digitizes and streamlines the process of applying for government certificates. It features a robust multi-step user registration system with Aadhaar verification, hierarchical authority management, and real-time application tracking.
+The **PCR Portal** is a full-stack web application built on the MERN stack that implements Direct Benefit Transfer (DBT) under the Protection of Civil Rights (PCR) Act, 1955 and the Scheduled Castes and Scheduled Tribes (Prevention of Atrocities) Act, 1989. It facilitates timely delivery of relief and assistance to victims of caste-based discrimination and atrocities, ensuring transparency, accountability, and efficient fund disbursement.
 
 ### 🎯 Problem Statement
 
-Traditional government certificate application processes involve:
-- ❌ Multiple physical visits to government offices
-- ❌ Manual document verification at each level
-- ❌ Lack of transparency in application status
-- ❌ Slow processing due to paper-based workflows
-- ❌ No centralized tracking system
+The Protection of Civil Rights (PCR) Act, 1955 and the Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Act, 1989 are landmark legislations aimed at ensuring justice and dignity for historically marginalized communities. However, the current implementation faces several challenges:
+
+- ❌ **Manual Process** - Disbursement of monetary reliefs is largely manual and time-consuming
+- ❌ **Procedural Delays** - Manual processes are prone to delays and misallocation of funds
+- ❌ **Lack of Transparency** - No real-time tracking of fund sanction and disbursement
+- ❌ **Data Security Issues** - Privacy and security concerns for victim data
+- ❌ **Limited Accessibility** - Difficulty for beneficiaries in remote, rural, and tribal areas
+- ❌ **No Integration** - Lack of integration with national databases (Aadhaar, DigiLocker, eCourts, CCTNS)
 
 ### ✅ Our Solution
 
-PCR Portal provides:
-- ✅ **100% Digital Process** - Apply from anywhere, anytime
-- ✅ **Aadhaar Integration** - Secure identity verification
-- ✅ **Hierarchical Processing** - Automated workflow through authority levels
-- ✅ **Real-Time Tracking** - Know your application status instantly
-- ✅ **Document Management** - Upload and verify documents digitally
-- ✅ **Admin Dashboard** - Complete oversight for district administrators
+PCR Portal provides a smart, tech-enabled solution for effective DBT implementation:
+
+- ✅ **Digital DBT System** - Complete digitization of benefit transfer process
+- ✅ **Victim Verification** - Accurate identification and verification of victims
+- ✅ **Real-Time Tracking** - Track sanction, disbursement, and utilization of funds
+- ✅ **Data Security** - Robust privacy and security measures for victim data
+- ✅ **Transparency & Accountability** - Complete transparency in financial assistance transfer
+- ✅ **National Database Integration** - Seamless integration with Aadhaar, DigiLocker, eCourts, CCTNS
+- ✅ **Grievance Redressal** - Comprehensive feedback and complaint management system
 
 ---
 
 ## ✨ Features
 
-### For Applicants
+### For Victims/Beneficiaries
 
-- 📱 **Multi-Step Registration**
+- 📱 **Secure Registration**
   - Mobile OTP verification
-  - Aadhaar authentication
-  - Automated account creation
+  - Aadhaar authentication with victim privacy protection
+  - Secure profile creation
 
-- 📝 **Application Management**
-  - Apply for multiple certificate types (Income, Residence, Caste, Character)
-  - Upload supporting documents
-  - Track application status in real-time
-  - View complete processing history
+- � **Relief & Assistance Management**
+  - Apply for monetary relief under PCR/PoA Acts
+  - Apply for inter-caste marriage incentives
+  - Upload supporting documents securely
+  - Track relief status in real-time
+  - View complete processing and disbursement history
 
-- 🔔 **Notifications**
-  - Real-time status updates
+- 🔔 **Notifications & Updates**
+  - Real-time status updates on relief applications
   - Document request alerts
-  - Approval/rejection notifications
+  - Disbursement notifications
+  - Grievance status updates
+
+- 📱 **Grievance Redressal**
+  - Submit complaints and feedback
+  - Track grievance resolution
+  - Direct communication with authorities
 
 ### For Authorities
 
 - 🏢 **Hierarchical Processing**
-  - **Level 1 (Data Entry):** Verify data completeness
-  - **Level 3 (Tehsildar):** Review and approve/reject
-  - **Level 4 (Assistant Collector):** Second-level review
-  - **Level 5 (District Collector):** Final approval authority
+  - **District Authorities:** Initial verification and processing
+  - **Social Welfare Departments:** Review and approval
+  - **Financial Institutions:** Fund disbursement
+  - **State/UT Administration:** Oversight and monitoring
 
-- ⚡ **Smart Workflows**
-  - Auto-forwarding on approval
-  - Manual forwarding options
-  - Document request capability
-  - Application hold/resume
+- ⚡ **Smart DBT Workflows**
+  - Victim identification and verification
+  - Auto-calculation of relief amounts as per Act provisions
+  - Real-time fund tracking
+  - Automated disbursement triggers
+  - Integration with banking systems
 
-- 📊 **Analytics Dashboard**
-  - Real-time statistics
-  - Performance metrics
-  - Status distribution charts
-  - Processing time analytics
+- 📊 **Comprehensive Dashboard**
+  - Real-time DBT statistics
+  - Fund utilization analytics
+  - Victim demographics and case analysis
+  - Performance metrics across departments
+  - Compliance monitoring
 
-- 🔍 **Admin View** (District Collector)
-  - See ALL applications across jurisdiction
-  - Filter by status, date, applicant
-  - Export reports
-  - Monitor authority performance
+- 🔍 **Administrative Controls**
+  - Monitor all relief applications
+  - Track fund allocation and disbursement
+  - Generate compliance reports
+  - Audit trail for all transactions
+  - Integration with CCTNS for case tracking
+
+### System Integration
+
+- 🔗 **National Database Integration**
+  - **Aadhaar:** Victim identity verification
+  - **DigiLocker:** Document verification
+  - **eCourts:** Case status integration
+  - **CCTNS:** Crime tracking integration
+  - **Banking APIs:** Direct fund transfer
 
 ---
 
@@ -336,23 +359,24 @@ After running `setup-authorities.js`, use these credentials:
 
 | Authority | Designation | Password | Access Level |
 |-----------|-------------|----------|--------------|
-| Data Entry Operator | `DATA_ENTRY_OPERATOR` | `password123` | Level 1 |
-| Tehsildar | `TEHSILDAR_CP_ZONE` | `password123` | Level 3 |
-| Assistant Collector | `ASSISTANT_COLLECTOR_NORTH` | `password123` | Level 4 |
-| District Collector | `DISTRICT_COLLECTOR_DELHI` | `password123` | Level 5 |
+| District Magistrate | `DISTRICT_MAGISTRATE` | `password123` | District Authority |
+| Social Welfare Officer | `SOCIAL_WELFARE_OFFICER` | `password123` | Relief Review |
+| Financial Institution | `FINANCIAL_INSTITUTION` | `password123` | DBT Processing |
+| State Administrator | `STATE_ADMINISTRATOR` | `password123` | Monitoring |
 
 ⚠️ **Important:** Change these passwords in production!
 
-### Applicants
+### Victims/Beneficiaries
 
-- Register through the signup flow
-- Login credentials will be provided after Aadhaar verification
+- Register through the signup flow with mobile OTP
+- Identity verification through Aadhaar (with privacy protection)
+- Login credentials provided after successful verification
 
 ---
 
 ## 🎯 Usage Examples
 
-### User Registration Flow
+### Victim Registration Flow
 
 ```javascript
 // 1. Request Mobile OTP
@@ -369,7 +393,7 @@ POST /api/auth/verify-mobile-otp
 }
 // Returns: { tempToken: "..." }
 
-// 3. Initiate Aadhaar Verification
+// 3. Initiate Aadhaar Verification (with privacy protection)
 POST /api/auth/aadhaar/initiate
 Headers: { Authorization: "Bearer <tempToken>" }
 {
@@ -381,72 +405,116 @@ POST /api/auth/aadhaar/verify
 {
   "transactionId": "...",
   "otp": "123456",
-  "aadhaarData": { ... }
+  "aadhaarData": { ... },
+  "victimDetails": { ... }
 }
 // Returns: { user: {...}, loginCredentials: {...} }
 ```
 
-### Submit Application
+### Apply for Relief/Assistance
 
 ```javascript
-POST /api/applications/submit
+POST /api/relief/apply
 {
-  "applicationData": {
-    "purpose": "income_certificate",
-    "description": "Need income certificate for scholarship",
-    "urgency": "normal"
+  "reliefType": "monetary_relief", // or "inter_caste_marriage"
+  "caseDetails": {
+    "crimeType": "atrocity_under_poa_act",
+    "firNumber": "FIR/2024/123",
+    "policeStation": "Central Police Station",
+    "incidentDate": "2024-01-15"
   },
   "documents": [
     {
-      "type": "aadhaar",
+      "type": "fir_copy",
+      "status": "submitted"
+    },
+    {
+      "type": "medical_certificate",
       "status": "submitted"
     }
-  ]
+  ],
+  "bankDetails": {
+    "accountNumber": "1234567890",
+    "ifscCode": "SBIN0001234",
+    "accountHolder": "Victim Name"
+  }
 }
 ```
 
-### Authority Review
+### Authority Review & DBT Processing
 
 ```javascript
-// Approve Application
-POST /api/authority/review/:applicationId
+// Verify and Approve Relief
+POST /api/authority/review-relief/:applicationId
 {
   "action": "approve",
-  "comments": "Application verified and approved"
+  "reliefAmount": 50000,
+  "comments": "Case verified, relief approved as per PCR Act provisions",
+  "disbursementSchedule": "immediate"
 }
 
-// Auto-forwards to next authority level
+// Initiate DBT
+POST /api/dbt/initiate/:applicationId
+{
+  "amount": 50000,
+  "beneficiaryAccount": "1234567890",
+  "purpose": "Relief under PCR Act - Case FIR/2024/123"
+}
+// Auto-transfers funds and updates tracking
 ```
 
 ---
 
-## 🔄 Application Workflow
+## 🔄 Relief & DBT Workflow
 
 ```
-User Submits Application
+Victim Applies for Relief
          ↓
-Data Entry Operator (Level 1)
-├─ Verify completeness
-├─ If Complete → Auto-forward to Tehsildar
-└─ If Incomplete → Send back to user
+District Authority (Initial Verification)
+├─ Verify victim identity (Aadhaar + case details)
+├─ Validate supporting documents (FIR, medical reports, etc.)
+├─ If Complete → Forward to Social Welfare Department
+└─ If Incomplete → Request additional documents
          ↓
-Tehsildar (Level 3)
-├─ Review application
-├─ If Approve → Auto-forward to Assistant Collector
-└─ If Reject → End process
+Social Welfare Department (Review & Approval)
+├─ Review case as per PCR/PoA Act provisions
+├─ Calculate relief amount based on Act guidelines
+├─ If Approve → Forward to Financial Institution
+└─ If Reject → Notify victim with reasons
          ↓
-Assistant Collector (Level 4)
-├─ Second-level review
-├─ If Approve → Auto-forward to District Collector
-└─ If Reject → End process
+Financial Institution (DBT Processing)
+├─ Validate beneficiary bank details
+├─ Initiate Direct Benefit Transfer (DBT)
+├─ If Success → Update disbursement status
+└─ If Failed → Retry or manual intervention
          ↓
-District Collector (Level 5)
-├─ Final approval
-├─ If Accept → Forward to Banking Section
-└─ If Reject → End process
+State/UT Administration (Monitoring)
+├─ Monitor fund utilization
+├─ Generate compliance reports
+├─ Track overall scheme performance
+└─ Update central government dashboard
          ↓
-Banking Section
-└─ Certificate issued
+Relief Disbursed to Victim
+```
+
+### Inter-Caste Marriage Incentive Flow
+
+```
+Couple Applies for Incentive
+         ↓
+District Authority
+├─ Verify marriage certificate
+├─ Validate caste certificates
+├─ Check eligibility criteria
+└─ Forward if eligible
+         ↓
+Social Welfare Department
+├─ Final verification
+├─ Approve incentive amount
+└─ Initiate DBT
+         ↓
+Financial Institution
+└─ Disburse incentive to couple's account
 ```
 
 ---
@@ -475,17 +543,20 @@ npm test
 
 ### Manual Testing Checklist
 
-- [ ] User registration flow (Mobile OTP → Aadhaar)
-- [ ] User login (OTP and Password methods)
+- [ ] Victim registration flow (Mobile OTP → Aadhaar)
+- [ ] Victim login (OTP and Password methods)
 - [ ] Authority login
-- [ ] Application submission
-- [ ] Document upload
-- [ ] Data verification (Level 1)
-- [ ] Application review (Level 3, 4, 5)
-- [ ] Auto-forwarding on approve
-- [ ] Status tracking
+- [ ] Relief application submission
+- [ ] Document upload (FIR, medical certificates, etc.)
+- [ ] Victim identity verification
+- [ ] Relief review and approval
+- [ ] DBT initiation and processing
+- [ ] Real-time fund tracking
+- [ ] Grievance submission and tracking
+- [ ] Inter-caste marriage incentive application
+- [ ] Integration with national databases
 - [ ] Reports generation
-- [ ] Admin view (District Collector)
+- [ ] Admin dashboard (monitoring view)
 
 ---
 
@@ -513,25 +584,51 @@ Production: https://api.your-domain.com/api
 | GET | `/auth/session` | Get session info |
 | POST | `/auth/logout` | Logout |
 
-### Application Endpoints
+### Relief & DBT Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/applications/submit` | Submit new application |
-| GET | `/applications/user/:userId` | Get user applications |
-| GET | `/applications/:id` | Get application details |
-| POST | `/applications/:id/upload-document` | Upload document |
+| POST | `/relief/apply` | Apply for relief/assistance |
+| GET | `/relief/victim/:victimId` | Get victim's relief applications |
+| GET | `/relief/:id` | Get relief application details |
+| POST | `/relief/:id/upload-document` | Upload supporting documents |
+
+### DBT Processing Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/dbt/initiate/:applicationId` | Initiate direct benefit transfer |
+| GET | `/dbt/status/:transactionId` | Get DBT transaction status |
+| GET | `/dbt/track/:applicationId` | Track fund disbursement |
+| POST | `/dbt/callback` | Bank callback for transaction status |
 
 ### Authority Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/authority/dashboard` | Get dashboard data |
-| GET | `/authority/pending` | Get pending applications |
-| POST | `/authority/review/:id` | Review application |
-| POST | `/authority/forward/:id` | Forward application |
-| GET | `/authority/forwarding-options` | Get forwarding options |
-| POST | `/authority/data-verification/:id` | Verify data |
+| GET | `/authority/dashboard` | Get dashboard with DBT statistics |
+| GET | `/authority/pending-relief` | Get pending relief applications |
+| POST | `/authority/review-relief/:id` | Review relief application |
+| POST | `/authority/approve-dbt/:id` | Approve DBT transfer |
+| GET | `/authority/fund-utilization` | Get fund utilization reports |
+
+### Grievance Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/grievance/submit` | Submit new grievance |
+| GET | `/grievance/victim/:victimId` | Get victim's grievances |
+| GET | `/grievance/:id` | Get grievance details |
+| POST | `/grievance/:id/respond` | Authority response to grievance |
+
+### Integration Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/integration/aadhaar/verify` | Aadhaar verification with privacy |
+| GET | `/integration/digilocker/documents` | Fetch documents from DigiLocker |
+| GET | `/integration/ecourts/case/:caseId` | Get case details from eCourts |
+| GET | `/integration/cctns/fir/:firNumber` | Get FIR details from CCTNS |
 
 For complete API documentation, see [SYSTEM_DOCUMENTATION.md](./SYSTEM_DOCUMENTATION.md#8-api-reference)
 
@@ -690,25 +787,30 @@ Have an idea? We'd love to hear it!
 
 ### Version 1.1.0 (Planned)
 
-- [ ] Email notifications
-- [ ] SMS integration for real OTP
-- [ ] PDF certificate generation
-- [ ] Digital signature integration
-- [ ] Mobile app (React Native)
-- [ ] Multi-language support
-- [ ] Payment gateway integration
-- [ ] Advanced analytics dashboard
-- [ ] Export to Excel/CSV
-- [ ] Audit log system
+- [ ] Real-time SMS notifications for DBT status
+- [ ] Email notifications for relief application updates
+- [ ] Enhanced integration with more banks for DBT
+- [ ] Digital signature for relief certificates
+- [ ] Mobile app for victims (React Native)
+- [ ] Advanced analytics for fund utilization
+- [ ] Integration with more state databases
+- [ ] Automated compliance reporting
+- [ ] Export relief data to Excel/CSV
+- [ ] Enhanced audit log system
+- [ ] Multi-language support for regional languages
 
 ### Version 2.0.0 (Future)
 
-- [ ] AI-powered document verification
-- [ ] Blockchain for certificate authenticity
-- [ ] Video call verification
-- [ ] Biometric authentication
-- [ ] Chatbot support
-- [ ] Integration with other government portals
+- [ ] AI-powered fraud detection for relief claims
+- [ ] Blockchain for transparent fund tracking
+- [ ] Biometric authentication for victims
+- [ ] Video call verification for remote areas
+- [ ] Chatbot support for grievance queries
+- [ ] Integration with Jan Aushadhi for medical relief
+- [ ] Predictive analytics for case outcomes
+- [ ] Real-time crime pattern analysis
+- [ ] Advanced victim protection measures
+- [ ] Integration with more national databases (PFMS, DBT Portal)
 
 ---
 
@@ -733,6 +835,12 @@ Unauthorized copying, modification, distribution, or use of this software is str
 
 ## 🙏 Acknowledgments
 
+### Legal Framework
+
+This solution is built to support the implementation of:
+- **Protection of Civil Rights (PCR) Act, 1955** - Ensuring justice for marginalized communities
+- **Scheduled Castes and Scheduled Tribes (Prevention of Atrocities) Act, 1989** - Preventing atrocities and providing relief
+
 ### Technologies Used
 
 - [Node.js](https://nodejs.org/) - JavaScript runtime
@@ -741,9 +849,17 @@ Unauthorized copying, modification, distribution, or use of this software is str
 - [React](https://react.dev/) - UI library
 - [Vite](https://vitejs.dev/) - Build tool
 
+### National Integration Partners
+
+- **Aadhaar (UIDAI)** - Identity verification with privacy protection
+- **DigiLocker** - Document verification and storage
+- **eCourts** - Case status and legal proceedings
+- **CCTNS** - Crime tracking and FIR integration
+- **Banking APIs** - Direct Benefit Transfer implementation
+
 ### Inspiration
 
-This project was inspired by the need to digitize government services and make them more accessible to citizens.
+This project was inspired by the need to digitize relief and assistance under the PCR and PoA Acts, ensuring timely delivery of justice and support to victims of caste-based discrimination and atrocities.
 
 ---
 
@@ -751,13 +867,20 @@ This project was inspired by the need to digitize government services and make t
 
 ### For Technical Issues
 
-- 📧 **Email:** support@pcr-portal.gov.in
-- 💬 **GitHub Issues:** [Create an issue](https://github.com/abhishukla0204/curly-potato/issues)
+- 📧 **Email:** saurabhmishra6341@gmail.com
+- 💬 **GitHub Issues:** [Create an issue](https://github.com/SAURABHM6341/curly-potato/issues)
 
-### For General Inquiries
+### For Relief & Assistance Queries
 
 - 🌐 **Website:** https://pcr-portal.gov.in
-- 📱 **Helpline:** +91-XXXX-XXXXXX
+- 📱 **Helpline:** 1800-XXX-XXXX (PCR Relief Helpline)
+- 📧 **Grievance Email:** grievance@pcr-portal.gov.in
+
+### Legal Support
+
+- 📞 **National SC/ST Helpline:** 1800-180-6127
+- 🏛️ **National Commission for SC:** ncsc.gov.in
+- 🏛️ **National Commission for ST:** ncst.gov.in
 
 ---
 
@@ -772,7 +895,7 @@ This project was inspired by the need to digitize government services and make t
 
 <div align="center">
 
-**Made with ❤️ for Digital India**
+**Made with ❤️ by Team VOID**
 
 [⬆ Back to Top](#-pcr-portal---public-certificate-request-portal)
 
