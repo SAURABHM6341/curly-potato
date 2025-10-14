@@ -24,7 +24,6 @@ const Sidebar = () => {
     { path: '/applicant/schemes', icon: '🎯', label: 'Browse Schemes' },
     { path: '/applicant/applications', icon: '📝', label: 'My Applications' },
     { path: '/applicant/documents', icon: '📁', label: 'Documents' },
-    { path: '/applicant/track', icon: '🔍', label: 'Track Status' },
     { path: '/applicant/profile', icon: '👤', label: 'Profile' }
   ];
 

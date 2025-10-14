@@ -74,12 +74,19 @@ const OTPVerify = () => {
         // Clear session data
         localStorage.removeItem('loginSession');
         
+        // Determine user role and prepare user object
+        const role = response.data.user.authorityId ? 'authority' : 'applicant';
+        const userWithRole = {
+          ...response.data.user,
+          role: role,
+          isAuthority: role === 'authority'
+        };
+        
         // Store user and redirect
-        await login(response.data.user);
+        await login(userWithRole);
         setToast({ message: 'Login successful!', type: 'success' });
         
         setTimeout(() => {
-          const role = response.data.user.authorityId ? 'authority' : 'applicant';
           navigate(`/${role}/dashboard`);
         }, 1000);
       }

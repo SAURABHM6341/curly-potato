@@ -185,16 +185,75 @@ class AuthController {
     try {
       const { identifier } = req.body; // Can be Aadhaar or User ID
 
-      // Determine if identifier is Aadhaar or User ID
-      const isAadhaar = /^\d{12}$/.test(identifier);
-      const isUserId = /^USER_\d{6}$/.test(identifier);
+      // Normalize identifier robustly to handle nested or wrapped payloads
+      let rawIdentifier = (req.body && req.body.identifier !== undefined) ? req.body.identifier : req.body;
 
-      if (!isAadhaar && !isUserId) {
-        return res.status(400).json({
-          success: false,
-          error: 'Invalid identifier. Please enter a valid Aadhaar number (12 digits) or User ID (USER_XXXXXX)',
-          code: 'INVALID_IDENTIFIER'
-        });
+      if (rawIdentifier && typeof rawIdentifier === 'object') {
+        if (typeof rawIdentifier.identifier === 'string' || typeof rawIdentifier.identifier === 'number') {
+          rawIdentifier = rawIdentifier.identifier;
+        } else if (typeof rawIdentifier.value === 'string' || typeof rawIdentifier.value === 'number') {
+          rawIdentifier = rawIdentifier.value;
+        } else {
+          const keys = Object.keys(rawIdentifier);
+          if (keys.length === 1) rawIdentifier = rawIdentifier[keys[0]];
+        }
+      }
+
+      if (rawIdentifier === undefined || rawIdentifier === null) {
+        return res.status(400).json({ success: false, error: 'Missing identifier', code: 'MISSING_IDENTIFIER' });
+      }
+
+      // Final normalized string
+      const normalizedIdentifier = String(rawIdentifier).trim();
+      
+      // Simple and reliable identification logic
+      // If starts with "USER" -> User ID, otherwise treat as Aadhaar
+      const isUserId = normalizedIdentifier.startsWith('USER');
+      const isAadhaar = !isUserId;
+
+      // Validate format based on type
+      if (isUserId) {
+        if (!/^USER_\d{6}$/.test(normalizedIdentifier)) {
+          return res.status(400).json({
+            success: false,
+            error: 'Invalid User ID format. Must be: USER_123456 (6 digits after USER_)',
+            code: 'INVALID_USER_ID_FORMAT'
+          });
+        }
+      } else {
+        // For testing: Use simplified Aadhaar validation
+        // TODO: In production, use full CryptoManager.validateAadhaar(normalizedIdentifier)
+
+        // Debug: log the raw and normalized identifier to catch hidden chars
+        try {
+          console.log('🔎 initiateLogin - identifier raw:', JSON.stringify(identifier), 'normalized:', JSON.stringify(normalizedIdentifier));
+        } catch (e) {
+          console.log('🔎 initiateLogin - identifier logging failed', e);
+        }
+
+        // Basic validation: 12 digits, not starting with 0 or 1
+        const digits12 = /^\d{12}$/.test(normalizedIdentifier);
+        const startsWith01 = /^[01]/.test(normalizedIdentifier);
+
+        console.log('🔎 Aadhaar checks -> digits12:', digits12, 'startsWith0or1:', startsWith01);
+
+        if (!digits12) {
+          return res.status(400).json({
+            success: false,
+            error: 'Invalid Aadhaar format. Must be exactly 12 digits',
+            code: 'INVALID_AADHAAR_FORMAT'
+          });
+        }
+
+        if (startsWith01) {
+          return res.status(400).json({
+            success: false,
+            error: 'Invalid Aadhaar number. Cannot start with 0 or 1',
+            code: 'INVALID_AADHAAR_FORMAT'
+          });
+        }
+
+        console.log('🔍 LOGIN: Aadhaar validation passed for:', CryptoManager.maskSensitiveData(normalizedIdentifier, 3));
       }
 
       let user;
@@ -202,7 +261,7 @@ class AuthController {
 
       if (isAadhaar) {
         // Find user by Aadhaar hash
-        const aadhaarHash = CryptoManager.hashAadhaar(identifier);
+        const aadhaarHash = CryptoManager.hashAadhaar(normalizedIdentifier);
         user = await User.findByAadhaarHash(aadhaarHash);
         if (!user) {
           return res.status(404).json({
@@ -214,7 +273,7 @@ class AuthController {
         mobile = user.mobileOriginal;
       } else {
         // Find user by User ID
-        user = await User.findByLoginUserId(identifier);
+        user = await User.findByLoginUserId(normalizedIdentifier);
         if (!user) {
           return res.status(404).json({
             success: false,
@@ -235,7 +294,7 @@ class AuthController {
       }
 
       // Generate OTP for login
-      const otpResult = OTPManager.generateOTP('login', identifier);
+      const otpResult = OTPManager.generateOTP('login', normalizedIdentifier);
 
       return res.status(200).json({
         success: true,
@@ -243,7 +302,8 @@ class AuthController {
         sessionId: otpResult.sessionId,
         expiresIn: otpResult.expiresIn,
         loginMethod: 'otp',
-        identifier: isAadhaar ? CryptoManager.maskSensitiveData(identifier, 3) : identifier,
+        identifierType: isAadhaar ? 'aadhaar' : 'userId',
+        identifier: isAadhaar ? CryptoManager.maskSensitiveData(normalizedIdentifier, 3) : normalizedIdentifier,
         mobile: user.mobile, // Already masked
         // Include OTP for testing (remove in production)
         testing: {
@@ -267,11 +327,39 @@ class AuthController {
    * POST /auth/verify-login-otp
    */
   static async verifyLoginOTP(req, res) {
-    try {
-      const { identifier, otp, sessionId } = req.body;
 
-      // Verify OTP
-      const otpVerification = OTPManager.verifyOTP('login', identifier, otp, sessionId);
+    try {
+      // Normalize identifier robustly to match how OTP was generated in initiateLogin
+      let rawIdentifier = (req.body && req.body.identifier !== undefined) ? req.body.identifier : req.body;
+      // Extract otp and sessionId from body
+      const { otp, sessionId } = req.body;
+
+      if (rawIdentifier && typeof rawIdentifier === 'object') {
+        if (typeof rawIdentifier.identifier === 'string' || typeof rawIdentifier.identifier === 'number') {
+          rawIdentifier = rawIdentifier.identifier;
+        } else if (typeof rawIdentifier.value === 'string' || typeof rawIdentifier.value === 'number') {
+          rawIdentifier = rawIdentifier.value;
+        } else {
+          const keys = Object.keys(rawIdentifier);
+          if (keys.length === 1) rawIdentifier = rawIdentifier[keys[0]];
+        }
+      }
+
+      if (rawIdentifier === undefined || rawIdentifier === null) {
+        return res.status(400).json({ success: false, error: 'Missing identifier', code: 'MISSING_IDENTIFIER' });
+      }
+
+      const normalizedIdentifier = String(rawIdentifier).trim();
+
+      // Debug: log the identifier being used for OTP verification
+      console.log('🔎 verifyLoginOTP - normalized identifier:', JSON.stringify(normalizedIdentifier));
+      console.log('🔎 verifyLoginOTP - sessionId:', sessionId);
+      console.log('🔎 verifyLoginOTP - otp:', otp);
+
+      // Verify OTP using normalized identifier so storage key matches
+      const otpVerification = OTPManager.verifyOTP('login', normalizedIdentifier, otp, sessionId);
+      
+      console.log('🔎 OTP verification result:', otpVerification);
       
       if (!otpVerification.success) {
         return res.status(400).json({
@@ -282,15 +370,40 @@ class AuthController {
         });
       }
 
-      // Find user
+      // Find user using the same normalized identifier
       let user;
-      const isAadhaar = /^\d{12}$/.test(identifier);
+      const isUserId = normalizedIdentifier.startsWith('USER');
+      const isAadhaar = !isUserId;
 
-      if (isAadhaar) {
-        const aadhaarHash = CryptoManager.hashAadhaar(identifier);
-        user = await User.findByAadhaarHash(aadhaarHash);
+      if (isUserId) {
+        // Validate User ID format
+        if (!/^USER_\d{6}$/.test(normalizedIdentifier)) {
+          return res.status(400).json({
+            success: false,
+            error: 'Invalid User ID format',
+            code: 'INVALID_USER_ID_FORMAT'
+          });
+        }
+        user = await User.findByLoginUserId(normalizedIdentifier);
       } else {
-        user = await User.findByLoginUserId(identifier);
+        // For testing: simplified Aadhaar validation
+        if (!/^\d{12}$/.test(normalizedIdentifier)) {
+          return res.status(400).json({
+            success: false,
+            error: 'Invalid Aadhaar format. Must be exactly 12 digits',
+            code: 'INVALID_AADHAAR_FORMAT'
+          });
+        }
+        if (/^[01]/.test(normalizedIdentifier)) {
+          return res.status(400).json({
+            success: false,
+            error: 'Invalid Aadhaar number. Cannot start with 0 or 1',
+            code: 'INVALID_AADHAAR_FORMAT'
+          });
+        }
+
+        const aadhaarHash = CryptoManager.hashAadhaar(normalizedIdentifier);
+        user = await User.findByAadhaarHash(aadhaarHash);
       }
 
       if (!user) {
@@ -318,7 +431,7 @@ class AuthController {
       await user.recordLogin();
 
       // Clean up OTP
-      OTPManager.cleanupOTP('login', identifier);
+      OTPManager.cleanupOTP('login', normalizedIdentifier);
 
       return res.status(200).json({
         success: true,
@@ -697,13 +810,40 @@ class AuthController {
    */
   static async resendOTP(req, res) {
     try {
-      const { type, identifier } = req.body;
+      // Normalize identifier robustly to handle nested or wrapped payloads
+      let rawIdentifier = (req.body && req.body.identifier !== undefined) ? req.body.identifier : req.body;
+      const { type } = req.body;
 
-      // Validate type
-      if (!['mobile', 'aadhaar'].includes(type)) {
+      if (rawIdentifier && typeof rawIdentifier === 'object') {
+        if (typeof rawIdentifier.identifier === 'string' || typeof rawIdentifier.identifier === 'number') {
+          rawIdentifier = rawIdentifier.identifier;
+        } else if (typeof rawIdentifier.value === 'string' || typeof rawIdentifier.value === 'number') {
+          rawIdentifier = rawIdentifier.value;
+        } else {
+          const keys = Object.keys(rawIdentifier);
+          if (keys.length === 1) rawIdentifier = rawIdentifier[keys[0]];
+        }
+      }
+
+      if (rawIdentifier === undefined || rawIdentifier === null) {
+        return res.status(400).json({ success: false, error: 'Missing identifier', code: 'MISSING_IDENTIFIER' });
+      }
+
+      const normalizedIdentifier = String(rawIdentifier).trim();
+
+      // Debug incoming body to help diagnose client payloads
+      try {
+        console.log('🔎 resendOTP - incoming body:', JSON.stringify(req.body));
+        console.log('🔎 resendOTP - normalized identifier:', JSON.stringify(normalizedIdentifier));
+      } catch (e) {
+        console.log('🔎 resendOTP - body logging failed', e);
+      }
+
+      // Validate type - support 'mobile', 'aadhaar', and 'login' (login used for OTP login flow)
+      if (!['mobile', 'aadhaar', 'login'].includes(type)) {
         return res.status(400).json({
           success: false,
-          error: 'Invalid OTP type. Must be "mobile" or "aadhaar"',
+          error: 'Invalid OTP type. Must be "mobile", "aadhaar", or "login"',
           code: 'INVALID_OTP_TYPE'
         });
       }
@@ -732,7 +872,7 @@ class AuthController {
       }
 
       // Validate identifier format
-      if (type === 'mobile' && !OTPManager.isValidMobile(identifier)) {
+      if (type === 'mobile' && !OTPManager.isValidMobile(normalizedIdentifier)) {
         return res.status(400).json({
           success: false,
           error: 'Invalid mobile number format',
@@ -740,7 +880,7 @@ class AuthController {
         });
       }
 
-      if (type === 'aadhaar' && !OTPManager.isValidAadhaar(identifier)) {
+      if (type === 'aadhaar' && !OTPManager.isValidAadhaar(normalizedIdentifier)) {
         return res.status(400).json({
           success: false,
           error: 'Invalid Aadhaar number format',
@@ -748,8 +888,10 @@ class AuthController {
         });
       }
 
-      // Resend OTP
-      const otpResult = OTPManager.resendOTP(type, identifier);
+  // Resend OTP
+  // For 'login' type we bypass mobile/aadhaar format validators because the
+  // login OTP may be generated against either an Aadhaar, UserID or mobile.
+  const otpResult = OTPManager.resendOTP(type, normalizedIdentifier);
 
       return res.status(200).json({
         success: true,

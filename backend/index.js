@@ -21,6 +21,7 @@ const database = require('./config/database');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const authorityRoutes = require('./routes/authority');
+const applicationRoutes = require('./routes/applications');
 
 // Initialize Express app
 const app = express();
@@ -108,6 +109,15 @@ app.get('/', (req, res) => {
         createTestApp: 'POST /authority/applications/create-test',
         createAuthority: 'POST /authority/create',
         listAuthorities: 'GET /authority/list'
+      },
+      applications: {
+        create: 'POST /applications',
+        myApplications: 'GET /applications/my-applications',
+        getStatus: 'GET /applications/:id/status',
+        update: 'PUT /applications/:id',
+        delete: 'DELETE /applications/:id',
+        uploadDocuments: 'POST /applications/:id/documents',
+        getDocuments: 'GET /applications/:id/documents'
       }
     }
   });
@@ -117,6 +127,7 @@ app.get('/', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/authority', authorityRoutes);
+app.use('/applications', applicationRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -156,7 +167,15 @@ app.use((req, res) => {
       'GET /authority/forwarding-options',
       'POST /authority/applications/create-test',
       'POST /authority/create',
-      'GET /authority/list'
+      'GET /authority/list',
+      // Application endpoints
+      'POST /applications',
+      'GET /applications/my-applications',
+      'GET /applications/:id/status',
+      'PUT /applications/:id',
+      'DELETE /applications/:id',
+      'POST /applications/:id/documents',
+      'GET /applications/:id/documents'
     ]
   });
 });

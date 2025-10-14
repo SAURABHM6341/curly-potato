@@ -28,36 +28,71 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuth = async () => {
     try {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        const userData = JSON.parse(storedUser);
-        setUser(userData);
+      setLoading(true);
+      
+      // Always validate with backend first (session-based auth)
+      const response = await authAPI.getSession();
+      
+      if (response.data && response.data.success) {
+        const sessionData = response.data;
+        
+        // Determine if user or authority based on sessionType
+        if (sessionData.sessionType === 'authority' && sessionData.authority) {
+          setUser({
+            ...sessionData.authority,
+            role: 'authority',
+            isAuthority: true
+          });
+        } else if (sessionData.sessionType === 'user' && sessionData.user) {
+          setUser({
+            ...sessionData.user,
+            role: 'applicant',
+            isAuthority: false
+          });
+        }
+        
         setIsAuthenticated(true);
         
-        // Validate session with backend
-        try {
-          await authAPI.getSession();
-        } catch (error) {
-          // Session invalid, clear local data
-          logout();
-        }
+        // Sync with localStorage for offline fallback
+        localStorage.setItem('user', JSON.stringify(sessionData));
+      } else {
+        // No valid session
+        logout();
       }
     } catch (error) {
       console.error('Auth check failed:', error);
-      logout();
+      
+      // Try localStorage as fallback, but still validate
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        try {
+          const userData = JSON.parse(storedUser);
+          // Don't set as authenticated until session is validated
+          setUser(userData);
+          setIsAuthenticated(false);
+        } catch (parseError) {
+          console.error('Failed to parse stored user data:', parseError);
+          logout();
+        }
+      } else {
+        logout();
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const login = async (userData, token = null) => {
+  const login = async (userData, tempToken = null) => {
     try {
       setUser(userData);
       setIsAuthenticated(true);
       localStorage.setItem('user', JSON.stringify(userData));
-      if (token) {
-        localStorage.setItem('token', token);
+      
+      // Only store temporary tokens (used during signup flow)
+      if (tempToken) {
+        localStorage.setItem('tempToken', tempToken);
       }
+      
       return true;
     } catch (error) {
       console.error('Login failed:', error);
@@ -67,14 +102,16 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
+      // Call backend logout to destroy session
       await authAPI.logout();
     } catch (error) {
       console.error('Logout error:', error);
+      // Continue with local cleanup even if backend call fails
     } finally {
+      // Always clear local state
       setUser(null);
       setIsAuthenticated(false);
       localStorage.removeItem('user');
-      localStorage.removeItem('token');
       localStorage.removeItem('tempToken');
     }
   };
@@ -85,11 +122,14 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify(updatedUser));
   };
 
-  // Get user role
+  // Get user role and permissions
   const getUserRole = () => {
     if (!user) return null;
     
-    // Determine role based on user data structure
+    // Role is directly stored from session data
+    if (user.role) return user.role;
+    
+    // Fallback: Determine role based on user data structure
     if (user.authorityId || user.designation) {
       return 'authority';
     }
@@ -97,6 +137,17 @@ export const AuthProvider = ({ children }) => {
       return 'admin';
     }
     return 'applicant';
+  };
+
+  // Check if user has authority access
+  const isAuthority = () => {
+    return user?.isAuthority === true || getUserRole() === 'authority';
+  };
+
+  // Check access level for authorities
+  const hasAccessLevel = (requiredLevel) => {
+    if (!isAuthority()) return false;
+    return user?.accessLevel >= requiredLevel;
   };
 
   const value = {
@@ -107,6 +158,8 @@ export const AuthProvider = ({ children }) => {
     logout,
     updateUser,
     getUserRole,
+    isAuthority,
+    hasAccessLevel,
     checkAuth
   };
 

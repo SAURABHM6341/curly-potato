@@ -202,8 +202,12 @@ UserSchema.methods.maskMobile = function(mobile) {
  */
 UserSchema.methods.recordLogin = function() {
   this.lastLogin = new Date();
-  this.loginCount += 1;
-  return this.save();
+  this.loginCount = (this.loginCount || 0) + 1;
+
+  // Update fields in the database without running full document validation.
+  // Using updateOne on the document avoids triggering required-field validation
+  // for fields that may be missing on partially selected documents.
+  return this.updateOne({ $set: { lastLogin: this.lastLogin, loginCount: this.loginCount } });
 };
 
 /**

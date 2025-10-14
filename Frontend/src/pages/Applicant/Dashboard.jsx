@@ -29,7 +29,10 @@ const Dashboard = () => {
   const fetchDashboard = async () => {
     try {
       const response = await userAPI.getDashboard();
-      setDashboardData(response.data);
+      console.log('Full response:', response);
+      console.log('Response.data:', response.data);
+      console.log('Response.data.data:', response.data.data);
+      setDashboardData(response.data.data);
     } catch (error) {
       setToast({
         message: error.response?.data?.error || 'Failed to load dashboard',
@@ -115,11 +118,11 @@ const Dashboard = () => {
 
           <button 
             className="action-card"
-            onClick={() => navigate('/applicant/track')}
+            onClick={() => navigate('/applicant/applications')}
           >
             <span className="action-icon">📊</span>
-            <h3 className="action-title">Track Status</h3>
-            <p className="action-description">Check your application status</p>
+            <h3 className="action-title">My Applications</h3>
+            <p className="action-description">View and track your applications</p>
           </button>
 
           <button 

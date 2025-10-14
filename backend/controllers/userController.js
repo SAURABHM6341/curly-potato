@@ -161,8 +161,36 @@ class UserController {
       // Update last login
       await user.recordLogin();
 
+      // Get applications statistics
+      const Application = require('../models/Application');
+      const applications = await Application.find({ userId: user.userId });
+      
+      // Calculate statistics
+      const stats = {
+        totalApplications: applications.length,
+        pending: applications.filter(app => 
+          ['submitted', 'under_review', 'pending_documents', 'forwarded', 'on_hold'].includes(app.status)
+        ).length,
+        approved: applications.filter(app => app.status === 'approved').length,
+        rejected: applications.filter(app => app.status === 'rejected').length
+      };
+
+      // Get recent applications (last 5)
+      const recentApplications = applications
+        .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt))
+        .slice(0, 5)
+        .map(app => ({
+          applicationId: app.applicationId,
+          schemeName: app.schemeName,
+          status: app.status,
+          submittedAt: app.submittedAt,
+          lastUpdated: app.updatedAt
+        }));
+
       // Dashboard data
       const dashboardData = {
+        stats,
+        recentApplications,
         welcome: {
           name: user.name,
           lastLogin: user.lastLogin,
@@ -195,7 +223,7 @@ class UserController {
       return res.status(200).json({
         success: true,
         message: 'Dashboard data retrieved successfully',
-        dashboard: dashboardData,
+        data: dashboardData,
         systemTime: new Date()
       });
 

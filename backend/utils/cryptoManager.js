@@ -176,8 +176,7 @@ class CryptoManager {
     }
 
     // Remove spaces and hyphens
-    const cleaned = aadhaar.replace(/[\s-]/g, '');
-
+    const cleaned = aadhaar;
     // Check length
     if (cleaned.length !== 12) {
       return { valid: false, error: 'Aadhaar number must be 12 digits' };

@@ -1,15 +1,8 @@
-/**
- * Authentication Routes
- * Clean route definitions using controllers and middleware
- * Follows MVC architecture best practices
- */
-
 const express = require('express');
 const router = express.Router();
 const AuthController = require('../controllers/authController');
 const AuthMiddleware = require('../middleware/authMiddleware');
 const { requireAuth, requireAuthorityAuth } = require('../middleware/sessionAuth');
-
 // ===== SIGNUP ROUTES =====
 
 /**

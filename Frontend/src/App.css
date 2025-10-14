@@ -13,14 +13,15 @@
 .app-content {
   display: flex;
   flex: 1;
-  padding-top: 60px; /* Navbar height */
+  padding-top: 0px; /* Navbar height */
 }
 
 .main-content {
   flex: 1;
-  margin-left: 250px; /* Sidebar width */
-  min-height: calc(100vh - 60px - 100px); /* viewport - navbar - footer */
+  margin-left: 50px; /* Match exact sidebar width */
+  min-height: calc(100vh - 70px - 100px); /* viewport - navbar - footer */
   transition: margin-left 0.3s ease;
+  padding: 0; /* Remove any default padding */
 }
 
 /* ===== COMMON PAGE STYLES ===== */

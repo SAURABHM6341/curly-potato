@@ -18,14 +18,18 @@ import SchemeList from './pages/Applicant/SchemeList';
 import SchemeForm from './pages/Applicant/SchemeForm';
 import MyApplications from './pages/Applicant/MyApplications';
 import TrackStatus from './pages/Applicant/TrackStatus';
+import Documents from './pages/Applicant/Documents';
 
 // Authority Pages
 import AuthorityDashboard from './pages/Authority/AuthorityDashboard';
 import PendingApprovals from './pages/Authority/PendingApprovals';
 import ReviewApplication from './pages/Authority/ReviewApplication';
+import Reports from './pages/Authority/Reports';
 
 // Common Pages
 import NotFound from './pages/NotFound';
+import Unauthorized from './pages/Unauthorized';
+import Profile from './pages/Profile';
 
 import './App.css';
 
@@ -36,8 +40,9 @@ function App() {
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/verify-otp" element={<OTPVerify />} />
-
+  <Route path="/verify-otp" element={<OTPVerify />} />
+  {/* Alias for legacy/navigation: accept both /otp-verify and /verify-otp */}
+  <Route path="/otp-verify" element={<OTPVerify />} />
           {/* Applicant Routes */}
           <Route
             path="/applicant/dashboard"
@@ -76,6 +81,22 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['applicant']}>
                 <TrackStatus />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/applicant/documents"
+            element={
+              <ProtectedRoute allowedRoles={['applicant']}>
+                <Documents />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/applicant/profile"
+            element={
+              <ProtectedRoute allowedRoles={['applicant']}>
+                <Profile />
               </ProtectedRoute>
             }
           />
@@ -121,10 +142,27 @@ function App() {
               </ProtectedRoute>
             }
           />
-
-          {/* Default Redirects */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/unauthorized" element={<NotFound />} />
+          <Route
+            path="/authority/reports"
+            element={
+              <ProtectedRoute allowedRoles={['authority']}>
+                <Reports />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/authority/profile"
+            element={
+              <ProtectedRoute allowedRoles={['authority']}>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          {/* Default route */}
+          <Route path='/' element={<Navigate to="/login"/>} />
+          
+          {/* Error routes */}
+          <Route path="/unauthorized" element={<Unauthorized />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>

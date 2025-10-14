@@ -16,32 +16,67 @@ const API = axios.create({
   }
 });
 
-// Request interceptor - Add auth token if available
+// Request interceptor - Add auth token only for temporary tokens (signup flow)
 API.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Only add Authorization header for temporary tokens during signup
+    const tempToken = localStorage.getItem('tempToken');
+    if (tempToken && (config.url.includes('/aadhaar/') || config.url.includes('/verify'))) {
+      config.headers.Authorization = `Bearer ${tempToken}`;
     }
+    
+    // Log request for debugging
+    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, {
+      data: config.data,
+      params: config.params,
+      headers: config.headers
+    });
+    
     return config;
   },
   (error) => {
+    console.error('API Request Error:', error);
     return Promise.reject(error);
   }
 );
 
 // Response interceptor - Handle errors globally
 API.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Log successful response for debugging
+    console.log(`API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`, {
+      status: response.status,
+      data: response.data
+    });
+    return response;
+  },
   (error) => {
+    // Log error for debugging
+    console.error('API Response Error:', error.response?.status, error.response?.data || error.message);
+    
     if (error.response) {
-      // Handle 401 Unauthorized
+      // Handle 401 Unauthorized - Session expired
       if (error.response.status === 401) {
-        localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = '/login';
+        localStorage.removeItem('tempToken');
+        
+        // Only redirect if not already on login page
+        if (!window.location.pathname.includes('/login') && 
+            !window.location.pathname.includes('/signup')) {
+          window.location.href = '/login';
+        }
+      }
+      
+      // Handle other common errors
+      if (error.response.status === 403) {
+        console.error('Access denied - insufficient permissions');
+      }
+      
+      if (error.response.status >= 500) {
+        console.error('Server error - please try again later');
       }
     }
+    
     return Promise.reject(error);
   }
 );
@@ -49,19 +84,21 @@ API.interceptors.response.use(
 // ===== AUTHENTICATION APIs =====
 
 export const authAPI = {
-  // Signup flow
+  // Signup flow (4-step process)
   requestMobileOTP: (mobile) => API.post('/auth/request-mobile-otp', { mobile }),
   verifyMobileOTP: (data) => API.post('/auth/verify-mobile-otp', data),
   initiateAadhaar: (aadhaar) => API.post('/auth/aadhaar/initiate', { aadhaar }),
   verifyAadhaar: (data) => API.post('/auth/aadhaar/verify', data),
   
-  // Login flow
+  // Login flow (dual methods)
   login: (identifier) => API.post('/auth/login', { identifier }),
   verifyLoginOTP: (data) => API.post('/auth/verify-login-otp', data),
   loginPassword: (data) => API.post('/auth/login-password', data),
+  
+  // Authority authentication
   authorityLogin: (data) => API.post('/auth/authority/login', data),
   
-  // Session management
+  // Session management (no tokens needed - cookies only)
   getSession: () => API.get('/auth/session'),
   logout: () => API.post('/auth/logout'),
   
@@ -81,34 +118,53 @@ export const userAPI = {
 };
 
 // ===== APPLICATION APIs =====
+// Note: Application creation/management APIs would be implemented in future phases
+// Currently focusing on authentication and authority system
 
 export const applicationAPI = {
+  // These endpoints would be added when application creation is implemented
   createApplication: (data) => API.post('/applications', data),
   getMyApplications: () => API.get('/applications/my-applications'),
   getApplicationStatus: (id) => API.get(`/applications/${id}/status`),
   updateApplication: (id, data) => API.put(`/applications/${id}`, data),
   deleteApplication: (id) => API.delete(`/applications/${id}`),
-  uploadDocuments: (id, formData) => API.post(`/applications/${id}/documents`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  }),
+  uploadDocuments: (id, data) => API.post(`/applications/${id}/documents`, data),
   getDocuments: (id) => API.get(`/applications/${id}/documents`)
 };
 
 // ===== AUTHORITY APIs =====
 
 export const authorityAPI = {
+  // Alternative authority login endpoint
+  login: (data) => API.post('/authority/login', data),
+  
+  // Dashboard and overview
   getDashboard: () => API.get('/authority/dashboard'),
+  
+  // Application management (matches backend routes exactly)
   getPendingApplications: (params) => API.get('/authority/applications/pending', { params }),
   getApplication: (id) => API.get(`/authority/applications/${id}`),
-  approveApplication: (id, data) => API.post(`/authority/applications/${id}/approve`, data),
-  rejectApplication: (id, data) => API.post(`/authority/applications/${id}/reject`, data),
-  forwardApplication: (id, data) => API.post(`/authority/applications/${id}/forward`, data),
-  getHigherAuthorities: () => API.get('/authority/higher-authorities'),
   reviewApplication: (id, data) => API.post(`/authority/applications/${id}/review`, data),
   getForwardingOptions: () => API.get('/authority/forwarding-options'),
+  
+  // Test and admin functions
   createTestApplication: () => API.post('/authority/applications/create-test'),
   createAuthority: (data) => API.post('/authority/create', data),
-  listAuthorities: () => API.get('/authority/list')
+  listAuthorities: () => API.get('/authority/list'),
+  
+  // Legacy methods (for backward compatibility)
+  approveApplication: (id, data) => API.post(`/authority/applications/${id}/review`, {
+    ...data, 
+    action: 'approve'
+  }),
+  rejectApplication: (id, data) => API.post(`/authority/applications/${id}/review`, {
+    ...data,
+    action: 'reject'
+  }),
+  forwardApplication: (id, data) => API.post(`/authority/applications/${id}/review`, {
+    ...data,
+    action: 'forward'
+  })
 };
 
 // ===== FILE UPLOAD API =====

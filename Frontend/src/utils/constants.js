@@ -19,7 +19,6 @@ export const ROUTES = {
   SCHEME_FORM: '/applicant/schemes/:id/apply',
   MY_APPLICATIONS: '/applicant/applications',
   UPLOAD_DOCUMENTS: '/applicant/documents',
-  TRACK_STATUS: '/applicant/track',
   
   // Authority routes
   AUTHORITY_DASHBOARD: '/authority/dashboard',
