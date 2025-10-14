@@ -1,0 +1,384 @@
+/* Data Verification Pages Styles */
+
+.data-verification-page,
+.data-verification-form-page {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #202124;
+  margin: 0 0 4px 0;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: #5f6368;
+  margin: 0;
+}
+
+.header-stats {
+  display: flex;
+  gap: 16px;
+}
+
+.stat-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 24px;
+  background: #e8f0fe;
+  border-radius: 8px;
+}
+
+.stat-number {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a73e8;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #5f6368;
+}
+
+/* Instructions */
+.verification-instructions {
+  background: #fff3cd;
+  border-left: 4px solid #f29900;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  border-radius: 4px;
+}
+
+.verification-instructions h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #202124;
+}
+
+.verification-instructions ul {
+  margin: 0;
+  padding-left: 24px;
+}
+
+.verification-instructions li {
+  margin-bottom: 8px;
+  color: #5f6368;
+  font-size: 14px;
+}
+
+/* Applications Table */
+.applications-table {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.applications-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.applications-table thead {
+  background: #f8f9fa;
+}
+
+.applications-table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #5f6368;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.applications-table td {
+  padding: 16px;
+  border-top: 1px solid #e0e0e0;
+  font-size: 14px;
+  color: #202124;
+}
+
+.applications-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.pagination button {
+  padding: 8px 16px;
+  border: 1px solid #dadce0;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #1a73e8;
+  transition: all 0.2s;
+}
+
+.pagination button:disabled {
+  color: #5f6368;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pagination button:not(:disabled):hover {
+  background: #f8f9fa;
+  border-color: #1a73e8;
+}
+
+.pagination span {
+  font-size: 14px;
+  color: #5f6368;
+}
+
+/* Verification Form Page */
+.verification-content {
+  display: grid;
+  gap: 24px;
+}
+
+.details-section,
+.checklist-section,
+.verification-form-section {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+}
+
+.details-section h2,
+.checklist-section h2,
+.verification-form-section h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #202124;
+  margin: 0 0 16px 0;
+}
+
+/* Detail Grid */
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.detail-item label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #5f6368;
+  margin-bottom: 4px;
+}
+
+.detail-value {
+  font-size: 15px;
+  color: #202124;
+  padding: 8px 0;
+}
+
+/* Documents List */
+.documents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.document-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.doc-status {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.doc-status.submitted {
+  background: #e8f0fe;
+  color: #1a73e8;
+}
+
+.doc-status.verified {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.no-documents {
+  color: #5f6368;
+  font-style: italic;
+  padding: 12px;
+  text-align: center;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+/* Checklist */
+.checklist-subtitle {
+  font-size: 13px;
+  color: #5f6368;
+  margin: -8px 0 16px 0;
+}
+
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.checklist-item:hover {
+  background: #e8f0fe;
+}
+
+.checklist-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.checklist-item span {
+  font-size: 14px;
+  color: #5f6368;
+}
+
+.checklist-item span.checked {
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.warning-message {
+  margin-top: 16px;
+  padding: 12px;
+  background: #fff3e0;
+  border-left: 4px solid #f29900;
+  color: #e65100;
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+/* Form Content */
+.form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.auto-escalation-info {
+  background: #e8f5e9;
+  border: 1px solid #4caf50;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.auto-escalation-info p {
+  margin: 0;
+  color: #1b5e20;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.doc-link {
+  color: #1a73e8;
+  text-decoration: none;
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+.doc-link:hover {
+  text-decoration: underline;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* Loading State */
+.page-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+}
+
+.page-loading p {
+  color: #5f6368;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .data-verification-page,
+  .data-verification-form-page {
+    padding: 16px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .applications-table {
+    overflow-x: auto;
+  }
+
+  .applications-table table {
+    min-width: 800px;
+  }
+}

@@ -43,21 +43,25 @@ export const USER_ROLES = {
 
 export const APPLICATION_STATUS = {
   SUBMITTED: 'submitted',
+  DATA_VERIFICATION: 'data_verification',
   UNDER_REVIEW: 'under_review',
   PENDING_DOCUMENTS: 'pending_documents',
   FORWARDED: 'forwarded',
   APPROVED: 'approved',
+  ACCEPTED: 'accepted',
   REJECTED: 'rejected',
   ON_HOLD: 'on_hold'
 };
 
 export const STATUS_COLORS = {
   submitted: { text: '#0056D2', bg: 'rgba(0,86,210,0.1)' },
+  data_verification: { text: '#F4B400', bg: 'rgba(244,180,0,0.1)' },
   pending: { text: '#F4B400', bg: 'rgba(244,180,0,0.1)' },
   under_review: { text: '#F4B400', bg: 'rgba(244,180,0,0.1)' },
   pending_documents: { text: '#F4B400', bg: 'rgba(244,180,0,0.1)' },
   forwarded: { text: '#0056D2', bg: 'rgba(0,86,210,0.1)' },
   approved: { text: '#0F9D58', bg: 'rgba(15,157,88,0.1)' },
+  accepted: { text: '#0F9D58', bg: 'rgba(15,157,88,0.1)' },
   rejected: { text: '#D93025', bg: 'rgba(217,48,37,0.1)' },
   on_hold: { text: '#5F6368', bg: 'rgba(95,99,104,0.1)' }
 };

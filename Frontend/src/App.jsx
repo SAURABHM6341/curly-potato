@@ -23,8 +23,11 @@ import Documents from './pages/Applicant/Documents';
 // Authority Pages
 import AuthorityDashboard from './pages/Authority/AuthorityDashboard';
 import PendingApprovals from './pages/Authority/PendingApprovals';
+import AllApplications from './pages/Authority/AllApplications';
 import ReviewApplication from './pages/Authority/ReviewApplication';
 import Reports from './pages/Authority/Reports';
+import DataVerificationList from './pages/Authority/DataVerificationList';
+import DataVerificationForm from './pages/Authority/DataVerificationForm';
 
 // Common Pages
 import NotFound from './pages/NotFound';
@@ -130,7 +133,7 @@ function App() {
             path="/authority/applications"
             element={
               <ProtectedRoute allowedRoles={['authority']}>
-                <PendingApprovals />
+                <AllApplications />
               </ProtectedRoute>
             }
           />
@@ -147,6 +150,23 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['authority']}>
                 <Reports />
+              </ProtectedRoute>
+            }
+          />
+          {/* Data Verification Routes (Level 1-2 only) */}
+          <Route
+            path="/authority/data-verification"
+            element={
+              <ProtectedRoute allowedRoles={['authority']}>
+                <DataVerificationList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/authority/data-verification/:applicationId"
+            element={
+              <ProtectedRoute allowedRoles={['authority']}>
+                <DataVerificationForm />
               </ProtectedRoute>
             }
           />

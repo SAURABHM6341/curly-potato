@@ -11,7 +11,7 @@ import './Layout.css';
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { getUserRole } = useAuth();
+  const { getUserRole, user } = useAuth();
   
   const role = getUserRole();
 
@@ -27,13 +27,41 @@ const Sidebar = () => {
     { path: '/applicant/profile', icon: '👤', label: 'Profile' }
   ];
 
-  const authorityLinks = [
-    { path: '/authority/dashboard', icon: '📊', label: 'Dashboard' },
-    { path: '/authority/pending', icon: '⏳', label: 'Pending Approvals' },
-    { path: '/authority/applications', icon: '📋', label: 'All Applications' },
-    { path: '/authority/reports', icon: '📈', label: 'Reports' },
-    { path: '/authority/profile', icon: '👤', label: 'Profile' }
-  ];
+  // Authority links based on access level
+  const getAuthorityLinks = () => {
+    const baseLinks = [
+      { path: '/authority/dashboard', icon: '📊', label: 'Dashboard', minLevel: 1 }
+    ];
+
+    // Data Verification for Level 1-2 (Data Entry Operators)
+    if (user?.accessLevel <= 2) {
+      baseLinks.push(
+        { path: '/authority/data-verification', icon: '✓', label: 'Data Verification', minLevel: 1 }
+      );
+    }
+
+    // Add links based on access level
+    if (user?.accessLevel >= 3) {
+      baseLinks.push(
+        { path: '/authority/pending', icon: '⏳', label: 'Pending Approvals', minLevel: 3 },
+        { path: '/authority/applications', icon: '📋', label: 'All Applications', minLevel: 3 }
+      );
+    }
+
+    if (user?.accessLevel >= 4) {
+      baseLinks.push(
+        { path: '/authority/reports', icon: '📈', label: 'Reports', minLevel: 4 }
+      );
+    }
+
+    baseLinks.push(
+      { path: '/authority/profile', icon: '👤', label: 'Profile', minLevel: 1 }
+    );
+
+    return baseLinks.filter(link => !link.minLevel || (user?.accessLevel >= link.minLevel));
+  };
+
+  const authorityLinks = getAuthorityLinks();
 
   const adminLinks = [
     { path: '/admin/dashboard', icon: '📊', label: 'Dashboard' },

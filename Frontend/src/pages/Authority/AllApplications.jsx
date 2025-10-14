@@ -1,6 +1,6 @@
 /**
- * PendingApprovals Page
- * View and manage pending applications
+ * AllApplications Page
+ * View ALL applications in the system (Admin view for District Collector)
  */
 
 import React, { useState, useEffect } from 'react';
@@ -14,7 +14,7 @@ import NoData from '../../components/EmptyState/NoData';
 import { useToast } from '../../context/ToastContext';
 import './PendingApprovals.css';
 
-const PendingApprovals = () => {
+const AllApplications = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
   
@@ -22,16 +22,19 @@ const PendingApprovals = () => {
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState('recent');
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all'); // Default to 'all' for admin view
 
   useEffect(() => {
-    fetchPendingApplications();
-  }, []);
+    fetchAllApplications();
+  }, [statusFilter]); // Refetch when status filter changes
 
-  const fetchPendingApplications = async () => {
+  const fetchAllApplications = async () => {
     setLoading(true);
     try {
-      // Don't pass status filter - get only pending applications
-      const response = await authorityAPI.getPendingApplications();
+      const params = {
+        status: statusFilter // Always pass status filter
+      };
+      const response = await authorityAPI.getPendingApplications(params);
       setApplications(response.data.applications || []);
     } catch (error) {
       console.error('Fetch error:', error);
@@ -68,7 +71,7 @@ const PendingApprovals = () => {
     return (
       <div className="pending-approvals-loading">
         <Spinner />
-        <p>Loading pending applications...</p>
+        <p>Loading all applications...</p>
       </div>
     );
   }
@@ -77,9 +80,9 @@ const PendingApprovals = () => {
     <div className="pending-approvals-page">
       <div className="page-header">
         <div>
-          <h1 className="page-title">Pending Approvals</h1>
+          <h1 className="page-title">All Applications</h1>
           <p className="page-subtitle">
-            {applications.length} application{applications.length !== 1 ? 's' : ''} waiting for review
+            {applications.length} application{applications.length !== 1 ? 's' : ''} in the system
           </p>
         </div>
       </div>
@@ -94,6 +97,22 @@ const PendingApprovals = () => {
             icon="🔍"
           />
         </div>
+        
+        {/* Status Filter */}
+        <SelectInput
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          options={[
+            { value: 'all', label: '📋 All Applications' },
+            { value: 'data_verification', label: '📝 Data Verification' },
+            { value: 'under_review', label: '👁️ Under Review' },
+            { value: 'pending_documents', label: '📄 Pending Documents' },
+            { value: 'on_hold', label: '⏸️ On Hold' },
+            { value: 'accepted', label: '✅ Accepted' },
+            { value: 'approved', label: '✅ Approved' },
+            { value: 'rejected', label: '❌ Rejected' }
+          ]}
+        />
         
         <SelectInput
           value={sortBy}
@@ -110,8 +129,8 @@ const PendingApprovals = () => {
       {filteredApplications.length === 0 ? (
         applications.length === 0 ? (
           <NoData
-            message="No pending applications"
-            description="All applications have been reviewed. Great work!"
+            message="No applications found"
+            description="No applications match the selected filters"
           />
         ) : (
           <div className="no-results">
@@ -127,6 +146,7 @@ const PendingApprovals = () => {
               key={app.applicationId}
               application={app}
               onAction={(app) => navigate(`/authority/review/${app.applicationId}`)}
+              showCurrentAuthority={true} // Always show which authority is handling it
             />
           ))}
         </div>
@@ -135,4 +155,4 @@ const PendingApprovals = () => {
   );
 };
 
-export default PendingApprovals;
+export default AllApplications;
