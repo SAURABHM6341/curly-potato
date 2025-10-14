@@ -9,7 +9,7 @@ import StatusTag from './StatusTag';
 import PrimaryButton from '../Button/PrimaryButton';
 import './Cards.css';
 
-const ApplicationCard = ({ application, onAction }) => {
+const ApplicationCard = ({ application, onAction, showCurrentAuthority = false }) => {
   const navigate = useNavigate();
 
   const formatDate = (date) => {
@@ -18,6 +18,10 @@ const ApplicationCard = ({ application, onAction }) => {
       month: 'short',
       year: 'numeric'
     });
+  };
+  
+  const formatAuthority = (designation) => {
+    return designation.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
 
   return (
@@ -50,10 +54,12 @@ const ApplicationCard = ({ application, onAction }) => {
           </div>
         )}
 
-        {application.currentAuthority?.designation && (
+        {showCurrentAuthority && application.currentAuthority?.designation && (
           <div className="application-card-detail">
-            <span className="detail-label">Current Authority:</span>
-            <span className="detail-value">{application.currentAuthority.designation}</span>
+            <span className="detail-label">📍 Current Authority:</span>
+            <span className="detail-value authority-badge">
+              {formatAuthority(application.currentAuthority.designation)}
+            </span>
           </div>
         )}
       </div>

@@ -40,6 +40,9 @@ const ReviewApplication = () => {
     setLoading(true);
     try {
       const response = await authorityAPI.getApplication(applicationId);
+      console.log('📄 Application data received:', response.data.application);
+      console.log('👤 Applicant name:', response.data.application?.applicantName);
+      console.log('👤 Applicant object:', response.data.application?.applicant);
       setApplication(response.data.application);
     } catch (error) {
       console.error('Fetch error:', error);
@@ -52,18 +55,30 @@ const ReviewApplication = () => {
 
   const fetchHigherAuthorities = async () => {
     try {
-      const response = await authorityAPI.getHigherAuthorities();
-      setHigherAuthorities(response.data.authorities || []);
+      const response = await authorityAPI.getForwardingOptions();
+      console.log('🔍 Forwarding options:', response.data);
+      const options = response.data.forwardingOptions || [];
+      setHigherAuthorities(options.map(opt => ({
+        designation: opt.designation,
+        name: opt.level,
+        department: opt.department
+      })));
     } catch (error) {
       console.error('Fetch error:', error);
     }
   };
 
   const handleAction = (action) => {
+    console.log('🎯 handleAction called with:', action);
+    
+    // Only validate forward action for selected authority
     if (action === 'forward' && !selectedAuthority) {
       showToast('Please select an authority to forward to', 'warning');
       return;
     }
+    
+    // Don't validate reject here - let modal handle it
+    console.log('✅ Opening modal for action:', action);
     setModalAction(action);
     setShowModal(true);
   };
@@ -155,7 +170,9 @@ const ReviewApplication = () => {
         <div className="overview-grid">
           <div className="overview-item">
             <span className="overview-label">Applicant</span>
-            <span className="overview-value">{application.applicantName}</span>
+            <span className="overview-value">
+              {application.applicantName || application.applicant?.name || 'Not Available'}
+            </span>
           </div>
           
           <div className="overview-item">
@@ -190,46 +207,192 @@ const ReviewApplication = () => {
         </div>
       </div>
 
-      {/* Documents */}
-      {application.documents && application.documents.length > 0 && (
-        <div className="review-section">
-          <h2 className="section-title">Uploaded Documents</h2>
-          
-          <div className="documents-list">
-            {application.documents.map((doc, index) => (
-              <DocumentCard
-                key={index}
-                document={doc}
-                onDownload={(doc) => window.open(doc.url, '_blank')}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Timeline */}
-      {application.timeline && application.timeline.length > 0 && (
-        <div className="review-section">
-          <h2 className="section-title">Review History</h2>
-          
-          <div className="timeline-list">
-            {application.timeline.map((event, index) => (
-              <div key={index} className="timeline-card">
-                <div className="timeline-header">
-                  <span className="timeline-action">{event.action.toUpperCase()}</span>
-                  <span className="timeline-date">{formatDate(event.timestamp)}</span>
+      {/* Documents Verification Section - ALWAYS SHOW FOR TEHSILDAR */}
+      <div className="review-section">
+        <h2 className="section-title">📎 Document Verification</h2>
+        <p className="section-subtitle">
+          <strong>⚠️ IMPORTANT:</strong> Verify all documents carefully before approving the application
+        </p>
+        
+        {application.documents && application.documents.length > 0 ? (
+          <>
+            <div className="documents-verification-grid">
+              {application.documents.map((doc, index) => (
+                <div key={index} className="document-verification-card">
+                  <div className="doc-header">
+                    <div className="doc-info">
+                      <span className="doc-icon">
+                        {doc.type.includes('address') || doc.type.includes('domicile') ? '🏠' :
+                         doc.type.includes('caste') ? '📜' :
+                         doc.type.includes('income') ? '💰' :
+                         doc.type.includes('aadhaar') ? '🆔' : '📄'}
+                      </span>
+                      <div>
+                        <h3 className="doc-title">{doc.type.replace(/_/g, ' ').toUpperCase()}</h3>
+                        <span className={`doc-status-badge ${doc.status}`}>{doc.status || 'pending'}</span>
+                      </div>
+                    </div>
+                    <SecondaryButton
+                      size="small"
+                      onClick={() => {
+                        if (doc.url) {
+                          window.open(doc.url, '_blank');
+                        } else {
+                          showToast('Document file not available', 'warning');
+                        }
+                      }}
+                    >
+                      👁️ View Document
+                    </SecondaryButton>
+                  </div>
+                  
+                  {doc.uploadedAt && (
+                    <p className="doc-meta">📅 Uploaded: {formatDate(doc.uploadedAt)}</p>
+                  )}
+                  
+                  {doc.verifiedBy ? (
+                    <p className="doc-meta verified">✅ Verified by: {doc.verifiedBy}</p>
+                  ) : (
+                    <p className="doc-meta pending">⏳ Pending verification</p>
+                  )}
                 </div>
-                {event.by && (
-                  <p className="timeline-by">By: {event.by.designation || event.by.name}</p>
-                )}
-                {event.comments && (
-                  <p className="timeline-comments">{event.comments}</p>
-                )}
+              ))}
+            </div>
+            
+            <div className="verification-checklist">
+              <h3>🔍 Document Verification Checklist</h3>
+              <ul className="checklist-items">
+                <li>✓ <strong>Domicile Certificate</strong> - Valid and from recognized authority</li>
+                <li>✓ <strong>Caste Certificate</strong> - Matches applicant details and is authentic</li>
+                <li>✓ <strong>Income Certificate</strong> - Recent (within 6 months) and verifiable</li>
+                <li>✓ <strong>All documents</strong> are clear, legible and properly scanned</li>
+                <li>✓ <strong>Information matches</strong> across all documents</li>
+              </ul>
+              <div className="verification-warning">
+                ⚠️ <strong>Note:</strong> Only approve if ALL documents are verified and authentic
               </div>
-            ))}
+            </div>
+          </>
+        ) : (
+          <div className="no-documents-warning">
+            <div className="warning-icon">⚠️</div>
+            <h3>No Documents Uploaded</h3>
+            <p>This application does not have any documents attached yet.</p>
+            <p><strong>Action Required:</strong> Request documents from applicant before approval.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Application Timeline / Processing History */}
+      <div className="review-section">
+        <h2 className="section-title">📋 Application Timeline</h2>
+        <p className="section-subtitle">Complete processing history of this application</p>
+        
+        <div className="timeline-container">
+          {/* Submission Event - Always show */}
+          <div className="timeline-event">
+            <div className="timeline-marker submission">
+              <span className="timeline-icon">📝</span>
+            </div>
+            <div className="timeline-content">
+              <div className="timeline-header">
+                <h3 className="timeline-action">Application Submitted</h3>
+                <span className="timeline-date">{formatDate(application.submittedAt)}</span>
+              </div>
+              <p className="timeline-by">By: {application.applicantName || application.applicant?.name || 'Applicant'}</p>
+              <p className="timeline-details">Application ID: {application.applicationId}</p>
+              <span className="timeline-badge submitted">Submitted</span>
+            </div>
+          </div>
+
+          {/* Processing History Events */}
+          {application.processingHistory && application.processingHistory.length > 0 ? (
+            application.processingHistory.map((event, index) => {
+              const getEventIcon = (action) => {
+                switch(action?.toLowerCase()) {
+                  case 'approved': return '✅';
+                  case 'rejected': return '❌';
+                  case 'forwarded': return '➡️';
+                  case 'requested_docs': return '📎';
+                  case 'review_started': return '👁️';
+                  case 'escalated': return '⬆️';
+                  default: return '🔄';
+                }
+              };
+
+              const getEventClass = (action) => {
+                switch(action?.toLowerCase()) {
+                  case 'approved': return 'approved';
+                  case 'rejected': return 'rejected';
+                  case 'forwarded': return 'forwarded';
+                  case 'requested_docs': return 'requested';
+                  default: return 'processing';
+                }
+              };
+
+              return (
+                <div key={index} className="timeline-event">
+                  <div className={`timeline-marker ${getEventClass(event.action)}`}>
+                    <span className="timeline-icon">{getEventIcon(event.action)}</span>
+                  </div>
+                  <div className="timeline-content">
+                    <div className="timeline-header">
+                      <h3 className="timeline-action">{event.action?.replace(/_/g, ' ').toUpperCase()}</h3>
+                      <span className="timeline-date">{formatDate(event.timestamp)}</span>
+                    </div>
+                    {event.designation && (
+                      <p className="timeline-by">
+                        By: <strong>{event.designation.replace(/_/g, ' ')}</strong>
+                        {event.department && ` (${event.department})`}
+                      </p>
+                    )}
+                    {event.forwardedTo && (
+                      <p className="timeline-details">
+                        Forwarded to: <strong>{event.forwardedTo.replace(/_/g, ' ')}</strong>
+                      </p>
+                    )}
+                    {event.comments && (
+                      <p className="timeline-comments">💬 {event.comments}</p>
+                    )}
+                    <span className={`timeline-badge ${getEventClass(event.action)}`}>
+                      {event.action?.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="timeline-event">
+              <div className="timeline-marker processing">
+                <span className="timeline-icon">⏳</span>
+              </div>
+              <div className="timeline-content">
+                <p className="timeline-empty">No processing history yet. Application is under initial review.</p>
+              </div>
+            </div>
+          )}
+
+          {/* Current Status */}
+          <div className="timeline-event current">
+            <div className="timeline-marker current">
+              <span className="timeline-icon">📍</span>
+            </div>
+            <div className="timeline-content">
+              <div className="timeline-header">
+                <h3 className="timeline-action">Current Status: {application.status?.replace(/_/g, ' ').toUpperCase()}</h3>
+                <span className="timeline-date">Now</span>
+              </div>
+              <p className="timeline-by">
+                Assigned to: <strong>{application.currentAuthority?.designation?.replace(/_/g, ' ')}</strong>
+                {application.currentAuthority?.department && ` (${application.currentAuthority.department})`}
+              </p>
+              <span className={`timeline-badge ${application.status}`}>
+                {application.status?.replace(/_/g, ' ')}
+              </span>
+            </div>
           </div>
         </div>
-      )}
+      </div>
 
       {/* Review Actions */}
       <div className="review-actions-section">
@@ -253,8 +416,8 @@ const ReviewApplication = () => {
               options={[
                 { value: '', label: 'Select Authority' },
                 ...higherAuthorities.map(auth => ({
-                  value: auth._id,
-                  label: `${auth.designation} (Level ${auth.level})`
+                  value: auth.designation,
+                  label: `${auth.name} - ${auth.department}`
                 }))
               ]}
             />
@@ -262,7 +425,10 @@ const ReviewApplication = () => {
 
           <div className="action-buttons">
             <SecondaryButton
-              onClick={() => handleAction('reject')}
+              onClick={() => {
+                console.log('🔴 Reject button clicked');
+                handleAction('reject');
+              }}
               disabled={actionLoading}
             >
               ❌ Reject
@@ -270,7 +436,10 @@ const ReviewApplication = () => {
             
             {higherAuthorities.length > 0 && (
               <SecondaryButton
-                onClick={() => handleAction('forward')}
+                onClick={() => {
+                  console.log('🔵 Forward button clicked');
+                  handleAction('forward');
+                }}
                 disabled={actionLoading}
               >
                 ➡️ Forward
@@ -278,7 +447,10 @@ const ReviewApplication = () => {
             )}
             
             <PrimaryButton
-              onClick={() => handleAction('approve')}
+              onClick={() => {
+                console.log('🟢 Approve button clicked');
+                handleAction('approve');
+              }}
               disabled={actionLoading}
             >
               ✅ Approve
@@ -288,17 +460,19 @@ const ReviewApplication = () => {
       </div>
 
       {/* Confirmation Modal */}
-      {showModal && (
-        <ConfirmModal
-          title={`Confirm ${modalAction?.toUpperCase()}`}
-          message={`Are you sure you want to ${modalAction} this application?`}
-          type={modalAction === 'approve' ? 'success' : modalAction === 'reject' ? 'danger' : 'warning'}
-          onConfirm={confirmAction}
-          onCancel={() => setShowModal(false)}
-          confirmText={modalAction?.toUpperCase()}
-          loading={actionLoading}
-        />
-      )}
+      <ConfirmModal
+        isOpen={showModal}
+        onClose={() => {
+          console.log('❌ Modal cancelled');
+          setShowModal(false);
+        }}
+        onConfirm={confirmAction}
+        title={`Confirm ${modalAction?.toUpperCase()}`}
+        message={`Are you sure you want to ${modalAction} this application?`}
+        type={modalAction === 'approve' ? 'success' : modalAction === 'reject' ? 'error' : 'warning'}
+        confirmText={modalAction?.toUpperCase() || 'Confirm'}
+        cancelText="Cancel"
+      />
     </div>
   );
 };

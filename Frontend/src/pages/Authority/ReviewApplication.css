@@ -135,7 +135,382 @@
   gap: 12px;
 }
 
+.section-subtitle {
+  font-size: 14px;
+  color: #5F6368;
+  margin: -8px 0 16px 0;
+}
+
+.documents-verification-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.document-verification-card {
+  background: #F8F9FA;
+  border: 2px solid #E0E0E0;
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.2s;
+}
+
+.document-verification-card:hover {
+  border-color: #1A73E8;
+  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.1);
+}
+
+.doc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.doc-info {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex: 1;
+}
+
+.doc-icon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.doc-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #202124;
+  margin: 0 0 4px 0;
+}
+
+.doc-status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.doc-status-badge.verified {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.doc-status-badge.pending {
+  background: #FFF3E0;
+  color: #E65100;
+}
+
+.doc-status-badge.rejected {
+  background: #FFEBEE;
+  color: #C62828;
+}
+
+.doc-meta {
+  font-size: 12px;
+  color: #5F6368;
+  margin: 4px 0;
+}
+
+.doc-meta.verified {
+  color: #2E7D32;
+  font-weight: 500;
+}
+
+.verification-checklist {
+  background: #E3F2FD;
+  border: 1px solid #1A73E8;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 24px;
+}
+
+.verification-checklist h3 {
+  font-size: 16px;
+  color: #1A73E8;
+  margin: 0 0 12px 0;
+  font-weight: 600;
+}
+
+.checklist-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.checklist-items li {
+  padding: 8px 0;
+  font-size: 14px;
+  color: #202124;
+  line-height: 1.5;
+}
+
+.verification-warning {
+  margin-top: 16px;
+  padding: 12px;
+  background: #FFF3E0;
+  border-left: 4px solid #FF9800;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #E65100;
+}
+
+.no-documents-warning {
+  text-align: center;
+  padding: 60px 20px;
+  background: #FFF3E0;
+  border: 2px dashed #FF9800;
+  border-radius: 12px;
+}
+
+.no-documents-warning .warning-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.no-documents-warning h3 {
+  font-size: 20px;
+  color: #E65100;
+  margin: 0 0 12px 0;
+}
+
+.no-documents-warning p {
+  font-size: 14px;
+  color: #5F6368;
+  margin: 8px 0;
+}
+
+.no-documents-warning strong {
+  color: #E65100;
+}
+
+.doc-meta.pending {
+  color: #FF9800;
+  font-weight: 500;
+}
+
 /* ===== TIMELINE ===== */
+.timeline-container {
+  position: relative;
+  padding: 20px 0;
+}
+
+.timeline-container::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, #1A73E8, #4285F4, #1A73E8);
+}
+
+.timeline-event {
+  position: relative;
+  padding-left: 60px;
+  margin-bottom: 32px;
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.timeline-marker {
+  position: absolute;
+  left: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  border: 3px solid #FFFFFF;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.timeline-marker.submission {
+  background: linear-gradient(135deg, #1A73E8, #4285F4);
+}
+
+.timeline-marker.approved {
+  background: linear-gradient(135deg, #34A853, #57BB63);
+}
+
+.timeline-marker.rejected {
+  background: linear-gradient(135deg, #EA4335, #F56E5E);
+}
+
+.timeline-marker.forwarded {
+  background: linear-gradient(135deg, #FF9800, #FFB74D);
+}
+
+.timeline-marker.requested {
+  background: linear-gradient(135deg, #9C27B0, #BA68C8);
+}
+
+.timeline-marker.processing {
+  background: linear-gradient(135deg, #607D8B, #78909C);
+}
+
+.timeline-marker.current {
+  background: linear-gradient(135deg, #1A73E8, #4285F4);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(26, 115, 232, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(26, 115, 232, 0);
+  }
+}
+
+.timeline-icon {
+  font-size: 20px;
+  color: white;
+}
+
+.timeline-content {
+  background: #FFFFFF;
+  border: 1px solid #E0E0E0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.timeline-content:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.timeline-event.current .timeline-content {
+  border: 2px solid #1A73E8;
+  background: #E8F0FE;
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  gap: 12px;
+}
+
+.timeline-action {
+  font-size: 16px;
+  font-weight: 600;
+  color: #202124;
+  margin: 0;
+}
+
+.timeline-date {
+  font-size: 13px;
+  color: #5F6368;
+  white-space: nowrap;
+}
+
+.timeline-by {
+  font-size: 14px;
+  color: #5F6368;
+  margin: 4px 0;
+}
+
+.timeline-by strong {
+  color: #1A73E8;
+  font-weight: 600;
+}
+
+.timeline-details {
+  font-size: 13px;
+  color: #5F6368;
+  margin: 4px 0;
+}
+
+.timeline-details strong {
+  color: #202124;
+}
+
+.timeline-comments {
+  font-size: 14px;
+  color: #202124;
+  margin: 8px 0;
+  padding: 8px 12px;
+  background: #F8F9FA;
+  border-left: 3px solid #1A73E8;
+  border-radius: 4px;
+  font-style: italic;
+}
+
+.timeline-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+  margin-top: 8px;
+}
+
+.timeline-badge.submitted {
+  background: #E8F0FE;
+  color: #1A73E8;
+}
+
+.timeline-badge.approved {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.timeline-badge.rejected {
+  background: #FFEBEE;
+  color: #C62828;
+}
+
+.timeline-badge.forwarded {
+  background: #FFF3E0;
+  color: #E65100;
+}
+
+.timeline-badge.requested {
+  background: #F3E5F5;
+  color: #6A1B9A;
+}
+
+.timeline-badge.processing {
+  background: #ECEFF1;
+  color: #455A64;
+}
+
+.timeline-badge.under_review,
+.timeline-badge.data_verification {
+  background: #FFF3E0;
+  color: #E65100;
+}
+
+.timeline-empty {
+  font-size: 14px;
+  color: #5F6368;
+  font-style: italic;
+  margin: 0;
+}
+
 .timeline-list {
   display: flex;
   flex-direction: column;

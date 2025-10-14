@@ -26,18 +26,35 @@ function Reports() {
       // Fetch dashboard stats and applications
       const [dashboardResponse, applicationsResponse] = await Promise.all([
         authorityAPI.getDashboard(),
-        authorityAPI.getPendingApplications()
+        authorityAPI.getPendingApplications({ status: 'all' }) // Get ALL applications for reports
       ]);
 
+      console.log('📊 Dashboard Response:', dashboardResponse.data);
+      console.log('📋 Applications Response:', applicationsResponse.data);
+
       if (dashboardResponse.data.success) {
-        setStats(dashboardResponse.data.statistics);
+        // Handle different response structures (dashboard vs statistics)
+        const statsData = dashboardResponse.data.statistics || dashboardResponse.data.dashboard?.statistics;
+        console.log('📊 Stats Data:', statsData);
+        
+        // Convert byStatus array to object for easier access
+        if (statsData?.byStatus && Array.isArray(statsData.byStatus)) {
+          const byStatusObj = {};
+          statsData.byStatus.forEach(item => {
+            byStatusObj[item._id] = item.count;
+          });
+          statsData.byStatus = byStatusObj;
+        }
+        
+        setStats(statsData);
       }
 
-      if (applicationsResponse.data.success) {
+      if (applicationsResponse.data.success || applicationsResponse.data.applications) {
         setApplications(applicationsResponse.data.applications || []);
       }
 
     } catch (error) {
+      console.error('Reports fetch error:', error);
       setToast({
         message: error.response?.data?.error || 'Failed to fetch reports data',
         type: 'error'
@@ -50,10 +67,14 @@ function Reports() {
   const getStatusColor = (status) => {
     switch (status) {
       case 'submitted': return '#3b82f6';
+      case 'data_verification': return '#f59e0b';
       case 'under_review': return '#f59e0b';
       case 'approved': return '#10b981';
+      case 'accepted': return '#10b981';
       case 'rejected': return '#ef4444';
       case 'forwarded': return '#8b5cf6';
+      case 'pending_documents': return '#f97316';
+      case 'on_hold': return '#6b7280';
       default: return '#6b7280';
     }
   };
@@ -81,7 +102,7 @@ function Reports() {
               <div className="stat-icon">📊</div>
               <div className="stat-info">
                 <h3>Total Applications</h3>
-                <p className="stat-value">{stats.totalApplications || 0}</p>
+                <p className="stat-value">{stats.totalApplications || applications.length || 0}</p>
               </div>
             </div>
             
@@ -89,7 +110,7 @@ function Reports() {
               <div className="stat-icon">⏳</div>
               <div className="stat-info">
                 <h3>Pending Review</h3>
-                <p className="stat-value">{stats.pendingReview || 0}</p>
+                <p className="stat-value">{stats.pendingApplications || stats.pendingReview || 0}</p>
               </div>
             </div>
             
@@ -97,7 +118,9 @@ function Reports() {
               <div className="stat-icon">✅</div>
               <div className="stat-info">
                 <h3>Approved</h3>
-                <p className="stat-value success">{stats.approved || 0}</p>
+                <p className="stat-value success">
+                  {(stats.byStatus?.approved || 0) + (stats.byStatus?.accepted || 0)}
+                </p>
               </div>
             </div>
             
@@ -105,7 +128,7 @@ function Reports() {
               <div className="stat-icon">❌</div>
               <div className="stat-info">
                 <h3>Rejected</h3>
-                <p className="stat-value error">{stats.rejected || 0}</p>
+                <p className="stat-value error">{stats.byStatus?.rejected || stats.rejected || 0}</p>
               </div>
             </div>
           </div>
@@ -118,20 +141,20 @@ function Reports() {
             <h2>Application Status Distribution</h2>
           </div>
           
-          {stats?.byStatus && stats.byStatus.length > 0 ? (
+          {stats?.byStatus && Object.keys(stats.byStatus).length > 0 ? (
             <div className="status-chart">
-              {stats.byStatus.map((item, index) => (
+              {Object.entries(stats.byStatus).map(([status, count], index) => (
                 <div key={index} className="status-bar">
                   <div className="status-label">
-                    <span className="status-name">{item._id || 'Unknown'}</span>
-                    <span className="status-count">{item.count}</span>
+                    <span className="status-name">{status.replace('_', ' ').toUpperCase()}</span>
+                    <span className="status-count">{count}</span>
                   </div>
                   <div className="status-progress">
                     <div 
                       className="status-fill"
                       style={{
-                        width: `${(item.count / (stats.totalApplications || 1)) * 100}%`,
-                        backgroundColor: getStatusColor(item._id)
+                        width: `${(count / (stats.totalApplications || 1)) * 100}%`,
+                        backgroundColor: getStatusColor(status)
                       }}
                     />
                   </div>
@@ -212,7 +235,11 @@ function Reports() {
               <h4>Completion Rate</h4>
               <p className="metric-value">
                 {stats?.totalApplications ? 
-                  `${Math.round(((stats.approved || 0) + (stats.rejected || 0)) / stats.totalApplications * 100)}%` :
+                  `${Math.round((
+                    (stats.byStatus?.approved || 0) + 
+                    (stats.byStatus?.accepted || 0) + 
+                    (stats.byStatus?.rejected || 0)
+                  ) / stats.totalApplications * 100)}%` :
                   '0%'
                 }
               </p>
@@ -222,7 +249,7 @@ function Reports() {
               <h4>Active Applications</h4>
               <p className="metric-value">
                 {applications.filter(app => 
-                  !['approved', 'rejected'].includes(app.status)
+                  !['approved', 'accepted', 'rejected'].includes(app.status)
                 ).length}
               </p>
             </div>

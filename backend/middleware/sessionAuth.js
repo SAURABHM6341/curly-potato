@@ -97,10 +97,11 @@ class SessionAuth {
 
   /**
    * Check minimum access level for authority
-   * @param {number} minAccessLevel - Minimum required access level
+   * Can accept either a numeric minimum level or an array of allowed role names
+   * @param {number|string[]} accessRequirement - Minimum access level (number) or allowed roles (array)
    * @returns {Function} Express middleware function
    */
-  static requireAccessLevel(minAccessLevel) {
+  static requireAccessLevel(accessRequirement) {
     return (req, res, next) => {
       if (!req.authority) {
         return res.status(401).json({
@@ -110,14 +111,42 @@ class SessionAuth {
         });
       }
 
-      if (req.authority.accessLevel < minAccessLevel) {
-        return res.status(403).json({
-          success: false,
-          error: 'Insufficient access level',
-          code: 'INSUFFICIENT_ACCESS',
-          required: minAccessLevel,
-          current: req.authority.accessLevel
-        });
+      // If accessRequirement is an array of role names, check if authority's access level is sufficient
+      // Role mapping: 'viewer' = 1, 'operator' = 2, 'reviewer' = 3-4, 'admin' = 5
+      if (Array.isArray(accessRequirement)) {
+        const roleToLevel = {
+          'viewer': 1,
+          'operator': 2,
+          'reviewer': 3,
+          'admin': 5
+        };
+
+        // Get the minimum required access level from the roles
+        const minLevel = Math.min(
+          ...accessRequirement.map(role => roleToLevel[role] || 5)
+        );
+
+        if (req.authority.accessLevel < minLevel) {
+          return res.status(403).json({
+            success: false,
+            error: 'Insufficient access level',
+            code: 'INSUFFICIENT_ACCESS',
+            requiredRoles: accessRequirement,
+            currentLevel: req.authority.accessLevel
+          });
+        }
+      } 
+      // If accessRequirement is a number, use it directly
+      else if (typeof accessRequirement === 'number') {
+        if (req.authority.accessLevel < accessRequirement) {
+          return res.status(403).json({
+            success: false,
+            error: 'Insufficient access level',
+            code: 'INSUFFICIENT_ACCESS',
+            required: accessRequirement,
+            current: req.authority.accessLevel
+          });
+        }
       }
 
       next();

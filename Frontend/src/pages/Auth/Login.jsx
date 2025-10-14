@@ -17,7 +17,7 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   
-  const [activeTab, setActiveTab] = useState('password'); // 'password' or 'otp'
+  const [activeTab, setActiveTab] = useState('password'); // 'password', 'otp', or 'authority'
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
   
@@ -30,6 +30,12 @@ const Login = () => {
   // OTP login state
   const [otpForm, setOtpForm] = useState({
     identifier: ''
+  });
+  
+  // Authority login state
+  const [authorityForm, setAuthorityForm] = useState({
+    designation: '',
+    password: ''
   });
   
   const [errors, setErrors] = useState({});
@@ -106,6 +112,47 @@ const Login = () => {
     }
   };
 
+  // Handle Authority login
+  const handleAuthorityLogin = async (e) => {
+    e.preventDefault();
+    setErrors({});
+    
+    if (!authorityForm.designation || !authorityForm.password) {
+      setErrors({ form: 'Please fill in all fields' });
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const response = await authAPI.authorityLogin(authorityForm);
+      
+      if (response.data.success) {
+        // Store authority data with proper role and redirect
+        const authorityData = {
+          ...response.data.authority,
+          role: 'authority',
+          isAuthority: true,
+          name: response.data.authority.designationName || response.data.authority.designation
+        };
+        
+        await login(authorityData);
+        setToast({ message: 'Authority login successful!', type: 'success' });
+        
+        // Redirect to authority dashboard
+        setTimeout(() => {
+          navigate('/authority/dashboard');
+        }, 1000);
+      }
+    } catch (error) {
+      setToast({ 
+        message: error.response?.data?.error || 'Authority login failed', 
+        type: 'error' 
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="auth-container">
       <div className="auth-card">
@@ -128,6 +175,12 @@ const Login = () => {
             onClick={() => setActiveTab('otp')}
           >
             OTP Login
+          </button>
+          <button
+            className={`auth-tab ${activeTab === 'authority' ? 'auth-tab-active' : ''}`}
+            onClick={() => setActiveTab('authority')}
+          >
+            Authority Login
           </button>
         </div>
 
@@ -196,6 +249,47 @@ const Login = () => {
           </form>
         )}
 
+        {/* Authority Login Form */}
+        {activeTab === 'authority' && (
+          <form onSubmit={handleAuthorityLogin} className="auth-form">
+            <TextInput
+              label="Designation"
+              name="designation"
+              placeholder="e.g., SDM_BLOCK_A"
+              value={authorityForm.designation}
+              onChange={(e) => setAuthorityForm({...authorityForm, designation: e.target.value})}
+              required
+              autoFocus
+            />
+            
+            <TextInput
+              label="Password"
+              name="password"
+              type="password"
+              placeholder="Enter your password"
+              value={authorityForm.password}
+              onChange={(e) => setAuthorityForm({...authorityForm, password: e.target.value})}
+              required
+            />
+            
+            {errors.form && (
+              <p className="auth-error">{errors.form}</p>
+            )}
+            
+            <PrimaryButton
+              type="submit"
+              fullWidth
+              loading={loading}
+            >
+              Login as Authority
+            </PrimaryButton>
+            
+            <p className="auth-hint">
+              For government officials and authorities only
+            </p>
+          </form>
+        )}
+
         {/* Footer Links */}
         <div className="auth-footer">
           <p className="auth-footer-text">
@@ -207,10 +301,6 @@ const Login = () => {
               Sign Up
             </button>
           </p>
-          
-          <button className="auth-link auth-link-small">
-            Authority Login
-          </button>
         </div>
       </div>
 

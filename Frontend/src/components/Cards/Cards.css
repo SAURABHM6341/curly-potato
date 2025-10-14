@@ -94,6 +94,16 @@
   text-align: right;
 }
 
+.authority-badge {
+  background: rgba(0, 86, 210, 0.1);
+  color: #0056D2;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
 .application-card-urgency {
   padding: 8px 12px;
   border-radius: 6px;

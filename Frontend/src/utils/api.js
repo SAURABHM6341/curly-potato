@@ -164,7 +164,13 @@ export const authorityAPI = {
   forwardApplication: (id, data) => API.post(`/authority/applications/${id}/review`, {
     ...data,
     action: 'forward'
-  })
+  }),
+  
+  // Data Verification APIs (for Data Entry Operators)
+  getPendingDataVerification: (params) => API.get('/authority/data-verification/pending', { params }),
+  getApplicationForVerification: (applicationId) => API.get(`/authority/data-verification/${applicationId}`),
+  verifyAndEscalateApplication: (applicationId, data) => API.post(`/authority/data-verification/${applicationId}/verify`, data),
+  getEscalationOptions: () => API.get('/authority/data-verification/escalation-options')
 };
 
 // ===== FILE UPLOAD API =====
