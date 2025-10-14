@@ -826,10 +826,8 @@ Unauthorized copying, modification, distribution, or use of this software is str
 
 ### Core Developers
 
-- **Backend Lead:** Node.js, Express, MongoDB architecture
-- **Frontend Lead:** React, UI/UX implementation
-- **DevOps:** Deployment, monitoring, CI/CD
-- **QA:** Testing, quality assurance
+- **Saurabh Mishra**
+- **Abhinav Shukla**
 
 ---
 
