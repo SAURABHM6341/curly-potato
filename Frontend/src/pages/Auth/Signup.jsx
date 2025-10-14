@@ -20,6 +20,7 @@ const Signup = () => {
   const [step, setStep] = useState(1); // 1: Mobile, 2: Mobile OTP, 3: Aadhaar, 4: Aadhaar OTP, 5: Credentials
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
+  const [showPassword, setShowPassword] = useState(false); // For password visibility toggle
   
   // Form data
   const [mobile, setMobile] = useState('');
@@ -349,8 +350,8 @@ const Signup = () => {
                 <label className="credential-label">Password</label>
                 <div className="credential-value-group">
                   <input
-                    type="text"
-                    value={credentials.password}
+                    type={showPassword ? "text" : "password"}
+                    value={credentials.password || ''}
                     readOnly
                     className="credential-value"
                   />
@@ -362,6 +363,13 @@ const Signup = () => {
                     📋
                   </button>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="credential-toggle"
+                >
+                  {showPassword ? '👁️ Hide Password' : '👁️ View Password'}
+                </button>
               </div>
             </div>
 
