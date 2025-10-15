@@ -6,11 +6,11 @@ import { AuthProvider } from './context/AuthContext'
 import { ToastProvider } from './context/ToastContext'
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  // <StrictMode> - Temporarily disabled to prevent double execution in dev
     <AuthProvider>
       <ToastProvider>
         <App />
       </ToastProvider>
     </AuthProvider>
-  </StrictMode>,
+  // </StrictMode>,
 )

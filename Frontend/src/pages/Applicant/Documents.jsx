@@ -3,9 +3,9 @@
  * Upload and manage application documents based on submitted applications
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { FaIdCard, FaHome, FaDollarSign, FaFileAlt, FaUpload, FaTimes, FaCheckCircle, FaClipboardList } from 'react-icons/fa';
-import { applicationAPI } from '../../utils/api';
+import { applicationAPI, documentAPI } from '../../utils/api';
 import { useToast } from '../../context/ToastContext';
 import PrimaryButton from '../../components/Button/PrimaryButton';
 import SecondaryButton from '../../components/Button/SecondaryButton';
@@ -23,6 +23,15 @@ function Documents() {
   const [selectedFiles, setSelectedFiles] = useState({});
   const [uploading, setUploading] = useState(false);
   const [expandedSections, setExpandedSections] = useState({});
+  const [forceUpdate, setForceUpdate] = useState(0); // Force re-render trigger
+  
+  // Debug render counter
+  const renderCount = useRef(0);
+  renderCount.current += 1;
+  console.log(`🔄 Documents component render #${renderCount.current}`);
+  
+  // Prevent duplicate operations
+  const operationInProgress = useRef(false);
 
   // Document requirements based on application purpose
   const documentRequirements = {
@@ -72,11 +81,11 @@ function Documents() {
         const requiredDocs = calculateRequiredDocuments(apps);
         setRequiredDocuments(requiredDocs);
         
-        // Fetch existing documents for all applications
+        // Fetch documents for each application using new document API
         const docsData = {};
         for (const app of apps) {
           try {
-            const docResponse = await applicationAPI.getDocuments(app.applicationId);
+            const docResponse = await documentAPI.getApplicationDocuments(app.applicationId);
             if (docResponse.data.success) {
               docsData[app.applicationId] = docResponse.data.documents || [];
             }
@@ -151,53 +160,122 @@ function Documents() {
     }));
   };
 
-  const handleUpload = async (documentType) => {
+  const handleUpload = useCallback(async (documentType) => {
     const files = selectedFiles[documentType];
     if (!files || files.length === 0) return;
 
+    // Strict duplicate prevention
+    if (operationInProgress.current || uploading) {
+      console.log('⚠️ Upload operation already in progress, blocking duplicate');
+      return;
+    }
+
     try {
+      console.log(`📤 Starting upload for: ${documentType}`);
+      operationInProgress.current = true;
       setUploading(true);
       
-      // For now, we'll upload to the first application that requires this document type
-      // In a real implementation, you'd let user choose which application to attach to
-      const targetAppId = applications[0]?.applicationId;
+      // Get applications that need this document type
+      const targetApplications = applications.filter(app => {
+        const purpose = app.purpose || 'other';
+        const requirements = documentRequirements[purpose] || documentRequirements['other'];
+        return requirements.some(req => req.type === documentType);
+      });
       
-      if (!targetAppId) {
-        setToast({ message: 'No application found to attach document', type: 'error' });
+      if (targetApplications.length === 0) {
+        setToast({ message: 'No applications found that require this document type', type: 'error' });
         return;
       }
 
-      // Simulate file upload (in real app, would upload to Cloudinary/S3)
-      const documentData = files.map(file => ({
-        type: documentType,
-        name: file.name,
-        size: file.size,
-        comments: `Uploaded: ${file.name} for ${documentType.replace('_', ' ')}`
-      }));
+      // Upload each file
+      let uploadedDocs = []; // Track uploaded documents for immediate UI update
+      
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append('document', file);
+        formData.append('documentType', documentType);
+        formData.append('applicationIds', JSON.stringify(targetApplications.map(app => app.applicationId)));
+        formData.append('comments', `Uploaded: ${file.name} for ${documentType.replace('_', ' ')}`);
 
-      const response = await applicationAPI.uploadDocuments(targetAppId, {
-        documents: documentData
-      });
-
-      if (response.data.success) {
-        setToast({ message: 'Documents uploaded successfully!', type: 'success' });
-        setSelectedFiles(prev => ({
-          ...prev,
-          [documentType]: []
-        }));
+        console.log(`📤 Uploading file: ${file.name}`);
+        const response = await documentAPI.upload(formData);
         
-        // Refresh documents
-        fetchApplicationsAndDocuments();
+        if (!response.data.success) {
+          throw new Error(response.data.error || 'Upload failed');
+        }
+        
+        console.log(`✅ Upload successful for: ${file.name}`);
+        
+        // Store the uploaded document info for immediate UI update
+        if (response.data.document) {
+          uploadedDocs.push({
+            documentId: response.data.document.documentId,
+            type: response.data.document.type,
+            originalName: response.data.document.originalName,
+            url: response.data.document.url,
+            fileSize: response.data.document.fileSizeBytes || 0,
+            fileFormat: 'pdf',
+            uploadedAt: response.data.document.uploadedAt || new Date().toISOString(),
+            status: 'submitted',
+            verificationComments: '',
+            verifiedBy: null,
+            verifiedAt: null,
+            linkedAt: new Date().toISOString()
+          });
+        }
       }
+
+      // Immediately update UI state with uploaded documents
+      if (uploadedDocs.length > 0) {
+        setUploadedDocuments(prevDocs => {
+          const newDocs = { ...prevDocs };
+          
+          // Add the uploaded documents to each target application
+          targetApplications.forEach(app => {
+            if (!newDocs[app.applicationId]) {
+              newDocs[app.applicationId] = [];
+            }
+            // Add all uploaded documents to this application
+            newDocs[app.applicationId] = [...newDocs[app.applicationId], ...uploadedDocs];
+          });
+          
+          console.log(`📤 Added ${uploadedDocs.length} documents to ${targetApplications.length} applications in UI`);
+          return newDocs;
+        });
+      }
+
+      setToast({ 
+        message: `${files.length} document(s) uploaded successfully!`, 
+        type: 'success' 
+      });
+      
+      // Clear selected files immediately
+      setSelectedFiles(prev => ({
+        ...prev,
+        [documentType]: []
+      }));
+      
+      // Force component re-render to update UI conditions
+      setForceUpdate(prev => prev + 1);
+      
+      // Background refresh to ensure server sync (but UI already updated)
+      console.log('🔄 Background sync with server');
+      setTimeout(() => {
+        fetchApplicationsAndDocuments();
+      }, 1000);
+
     } catch (error) {
+      console.error('❌ Upload error:', error);
       setToast({
-        message: error.response?.data?.error || 'Failed to upload documents',
+        message: error.response?.data?.error || error.message || 'Failed to upload documents',
         type: 'error'
       });
     } finally {
+      operationInProgress.current = false;
       setUploading(false);
+      console.log('🔓 Upload operation completed');
     }
-  };
+  }, [selectedFiles, uploading, applications, documentRequirements, setToast]);
 
   const toggleSection = (sectionKey) => {
     setExpandedSections(prev => ({
@@ -215,13 +293,85 @@ function Documents() {
     }
   };
 
-  const getUploadedDocumentStatus = (docType) => {
-    let totalUploaded = 0;
+  const getUploadedDocumentsForType = (docType) => {
+    let allDocs = [];
+    const seenDocuments = new Set(); // Track unique documents by documentId
+    
     Object.values(uploadedDocuments).forEach(docs => {
-      totalUploaded += docs.filter(doc => doc.type === docType).length;
+      docs.forEach(doc => {
+        if (doc.type === docType && !seenDocuments.has(doc.documentId)) {
+          seenDocuments.add(doc.documentId);
+          allDocs.push(doc);
+        }
+      });
     });
-    return totalUploaded;
+    
+    return allDocs;
   };
+
+  const handleDeleteDocument = useCallback(async (documentId, docType) => {
+    // Strict duplicate prevention
+    if (operationInProgress.current || uploading) {
+      console.log('⚠️ Delete operation already in progress, blocking duplicate');
+      return;
+    }
+
+    if (!documentId) {
+      console.error('❌ No documentId provided');
+      setToast({ message: 'Invalid document ID', type: 'error' });
+      return;
+    }
+
+    try {
+      console.log(`🗑️ Starting delete for document: ${documentId}`);
+      operationInProgress.current = true;
+      setUploading(true);
+      
+      const response = await documentAPI.deleteDocument(documentId);
+      console.log('🗑️ Delete API response:', response.data);
+      
+      if (response.data.success) {
+        console.log('✅ Delete successful, updating UI');
+        
+        // Immediately remove from UI state - remove from ALL applications
+        setUploadedDocuments(prevDocs => {
+          const newDocs = { ...prevDocs };
+          let totalRemoved = 0;
+          
+          Object.keys(newDocs).forEach(appId => {
+            const originalLength = newDocs[appId].length;
+            newDocs[appId] = newDocs[appId].filter(doc => doc.documentId !== documentId);
+            const removed = originalLength - newDocs[appId].length;
+            totalRemoved += removed;
+            if (removed > 0) {
+              console.log(`📤 Removed ${removed} instance(s) from app ${appId}`);
+            }
+          });
+          
+          console.log(`📤 Total instances removed: ${totalRemoved}`);
+          return newDocs;
+        });
+        
+        setToast({ 
+          message: 'Document deleted successfully', 
+          type: 'success' 
+        });
+        
+      } else {
+        throw new Error(response.data.error || 'Delete failed');
+      }
+    } catch (error) {
+      console.error('❌ Delete error:', error);
+      setToast({
+        message: error.response?.data?.error || error.message || 'Failed to delete document',
+        type: 'error'
+      });
+    } finally {
+      operationInProgress.current = false;
+      setUploading(false);
+      console.log('🔓 Delete operation completed');
+    }
+  }, [uploading, setToast]);
 
   const renderDocumentSection = (sectionKey, sectionTitle, documents) => {
     if (documents.length === 0) return null;
@@ -244,11 +394,15 @@ function Documents() {
         {isExpanded && (
           <div className="document-section-content">
             {documents.map((doc, index) => {
-              const uploadedCount = getUploadedDocumentStatus(doc.type);
-              const hasFiles = selectedFiles[doc.type]?.length > 0;
+              const uploadedDocs = getUploadedDocumentsForType(doc.type);
+              const hasUploadedDocs = uploadedDocs.length > 0;
+              const hasSelectedFiles = selectedFiles[doc.type]?.length > 0;
+              const uniqueKey = `${doc.type}-${index}-${forceUpdate}`; // Include forceUpdate in key
+              
+              console.log(`🔍 Document ${doc.type}: uploaded=${uploadedDocs.length}, hasSelected=${hasSelectedFiles}, shouldShowUpload=${!hasUploadedDocs || !doc.required}`);
               
               return (
-                <div key={index} className="document-item">
+                <div key={uniqueKey} className="document-item">
                   <div className="document-item-header">
                     <div className="document-info">
                       <span className="document-icon">{getDocumentIcon(doc.type)}</span>
@@ -259,15 +413,15 @@ function Documents() {
                         </h4>
                         <p className="document-description">
                           Needed for {doc.applicationsCount} application{doc.applicationsCount !== 1 ? 's' : ''}
-                          {uploadedCount > 0 && (
-                            <span className="upload-status"> • {uploadedCount} uploaded</span>
+                          {hasUploadedDocs && (
+                            <span className="upload-status"> • {uploadedDocs.length} uploaded</span>
                           )}
                         </p>
                       </div>
                     </div>
                     <div className="upload-status-indicator">
-                      {uploadedCount > 0 ? (
-                        <span className="status-uploaded">✓ Uploaded</span>
+                      {hasUploadedDocs ? (
+                        <span className="status-uploaded">✓ Fulfilled</span>
                       ) : doc.required ? (
                         <span className="status-required">Required</span>
                       ) : (
@@ -276,35 +430,114 @@ function Documents() {
                     </div>
                   </div>
 
-                  <div className="document-upload-area">
-                    <FileUpload
-                      name={`upload-${doc.type}`}
-                      onChange={(files) => handleFileSelect(doc.type, files)}
-                      accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                      multiple={true}
-                      maxSize={5}
-                      preview={true}
-                    />
-                    
-                    {hasFiles && (
-                      <div className="upload-actions">
-                        <PrimaryButton
-                          onClick={() => handleUpload(doc.type)}
-                          loading={uploading}
-                          size="small"
-                        >
-                          Upload {selectedFiles[doc.type].length} File{selectedFiles[doc.type].length !== 1 ? 's' : ''}
-                        </PrimaryButton>
-                        <SecondaryButton
-                          onClick={() => setSelectedFiles(prev => ({ ...prev, [doc.type]: [] }))}
-                          disabled={uploading}
-                          size="small"
-                        >
-                          Clear
-                        </SecondaryButton>
-                      </div>
-                    )}
-                  </div>
+                  {/* Show uploaded documents if any */}
+                  {hasUploadedDocs && (
+                    <div className="uploaded-documents">
+                      {uploadedDocs.map((uploadedDoc, docIndex) => {
+                        // Count how many applications this document is linked to
+                        let linkedAppsCount = 0;
+                        Object.values(uploadedDocuments).forEach(docs => {
+                          if (docs.some(d => d.documentId === uploadedDoc.documentId)) {
+                            linkedAppsCount++;
+                          }
+                        });
+                        
+                        return (
+                          <div key={`uploaded-${uploadedDoc.documentId || docIndex}`} className="uploaded-document-item">
+                            <div className="uploaded-doc-info">
+                              <FaCheckCircle className="uploaded-icon" />
+                              <div className="doc-details">
+                                <span className="uploaded-filename">{uploadedDoc.originalName}</span>
+                                <div className="doc-meta">
+                                  <span className="uploaded-date">
+                                    {new Date(uploadedDoc.uploadedAt).toLocaleDateString()}
+                                  </span>
+                                  {linkedAppsCount > 1 && (
+                                    <span className="linked-apps-count">
+                                      • Used in {linkedAppsCount} applications
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="uploaded-doc-actions">
+                              <SecondaryButton
+                                size="small"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  if (uploadedDoc.url) {
+                                    window.open(uploadedDoc.url, '_blank');
+                                  } else {
+                                    setToast({ message: 'Document URL not available', type: 'warning' });
+                                  }
+                                }}
+                                disabled={uploading}
+                              >
+                                View
+                              </SecondaryButton>
+                              <SecondaryButton
+                                size="small"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleDeleteDocument(uploadedDoc.documentId, doc.type);
+                                }}
+                                disabled={uploading}
+                                style={{ color: '#dc2626' }}
+                              >
+                                Delete
+                              </SecondaryButton>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Show upload area only if no documents are uploaded OR if it's optional */}
+                  {(!hasUploadedDocs || !doc.required) && (
+                    <div className="document-upload-area">
+                      <FileUpload
+                        name={`upload-${uniqueKey}`}
+                        onChange={(files) => handleFileSelect(doc.type, files)}
+                        accept=".pdf"
+                        multiple={true}
+                        maxSize={5}
+                        preview={true}
+                      />
+                      
+                      {hasSelectedFiles && (
+                        <div className="upload-actions">
+                          <PrimaryButton
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleUpload(doc.type);
+                            }}
+                            loading={uploading}
+                            disabled={uploading}
+                            size="small"
+                          >
+                            <FaUpload style={{ marginRight: '4px' }} />
+                            Upload {selectedFiles[doc.type].length} File{selectedFiles[doc.type].length !== 1 ? 's' : ''}
+                          </PrimaryButton>
+                          <SecondaryButton
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setSelectedFiles(prev => ({ ...prev, [doc.type]: [] }));
+                            }}
+                            disabled={uploading}
+                            size="small"
+                          >
+                            <FaTimes style={{ marginRight: '4px' }} />
+                            Clear
+                          </SecondaryButton>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -343,6 +576,14 @@ function Documents() {
       <div className="documents-header">
         <h1>Document Requirements</h1>
         <p>Upload the required documents for your {applications.length} application{applications.length !== 1 ? 's' : ''}</p>
+        
+        {/* Debug info - remove this after testing */}
+        <div style={{ background: '#f0f0f0', padding: '10px', margin: '10px 0', fontSize: '12px' }}>
+          <strong>Debug Info:</strong><br/>
+          Applications: {applications.length}<br/>
+          Uploaded Documents Keys: {Object.keys(uploadedDocuments).join(', ')}<br/>
+          Total Uploaded: {Object.values(uploadedDocuments).flat().length}
+        </div>
       </div>
 
       <div className="documents-content">

@@ -22,6 +22,7 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const authorityRoutes = require('./routes/authority');
 const applicationRoutes = require('./routes/applications');
+const documentRoutes = require('./routes/documents');
 
 // Initialize Express app
 const app = express();
@@ -118,6 +119,15 @@ app.get('/', (req, res) => {
         delete: 'DELETE /applications/:id',
         uploadDocuments: 'POST /applications/:id/documents',
         getDocuments: 'GET /applications/:id/documents'
+      },
+      documents: {
+        upload: 'POST /documents/upload',
+        myDocuments: 'GET /documents/my-documents',
+        applicationDocuments: 'GET /documents/application/:applicationId',
+        linkDocument: 'POST /documents/:documentId/link/:applicationId',
+        reusableDocuments: 'GET /documents/reusable',
+        deleteDocument: 'DELETE /documents/:documentId',
+        verifyDocument: 'POST /documents/:documentId/verify/:applicationId'
       }
     }
   });
@@ -128,6 +138,7 @@ app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/authority', authorityRoutes);
 app.use('/applications', applicationRoutes);
+app.use('/documents', documentRoutes);
 
 // 404 handler
 app.use((req, res) => {

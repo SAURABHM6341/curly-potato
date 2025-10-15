@@ -335,3 +335,77 @@
     gap: 4px;
   }
 }
+
+/* Uploaded Documents Styles */
+.uploaded-documents {
+  margin-top: 16px;
+  padding: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.uploaded-document-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.uploaded-document-item:last-child {
+  border-bottom: none;
+}
+
+.uploaded-doc-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.doc-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.doc-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.uploaded-icon {
+  color: #10b981;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.uploaded-filename {
+  font-weight: 500;
+  color: #1f2937;
+  font-size: 14px;
+}
+
+.uploaded-date {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.linked-apps-count {
+  color: #059669;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.uploaded-doc-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.status-uploaded {
+  background: #d1fae5 !important;
+  color: #065f46 !important;
+  border: 1px solid #a7f3d0 !important;
+}

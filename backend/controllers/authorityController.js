@@ -7,6 +7,7 @@
 const Authority = require('../models/Authority');
 const Application = require('../models/Application');
 const User = require('../models/User');
+const Document = require('../models/Document');
 
 class AuthorityController {
   /**
@@ -290,29 +291,46 @@ class AuthorityController {
       
       const totalCount = await Application.countDocuments(query);
       
-      const formattedApplications = applications.map(app => ({
-        applicationId: app.applicationId,
-        applicant: {
-          name: app.applicantName,
-          mobile: app.applicantMobile,
-          userId: app.userId?.loginUserId
-        },
-        application: {
-          purpose: app.applicationData.purpose,
-          description: app.applicationData.description,
-          urgency: app.applicationData.urgency
-        },
-        status: app.status,
-        submittedAt: app.submittedAt,
-        currentAuthority: app.currentAuthority, // Show current authority (useful for District Collector admin view)
-        assignedAt: app.currentAuthority.assignedAt,
-        processingTime: Math.round((new Date() - app.submittedAt) / (1000 * 60 * 60)), // hours
-        documents: app.documents.map(doc => ({
-          type: doc.type,
-          status: doc.status,
-          verifiedBy: doc.verifiedBy
-        })),
-        lastAction: app.processingChain[app.processingChain.length - 1] || null
+      // For each application, fetch the linked documents from the Document model
+      const formattedApplications = await Promise.all(applications.map(async (app) => {
+        // Fetch documents linked to this application
+        const documents = await Document.find({
+          'linkedApplications.applicationId': app.applicationId
+        }).select('documentId type originalName cloudinaryUrl linkedApplications overallStatus');
+
+        // Format documents for the response
+        const formattedDocuments = documents.map(doc => {
+          const appLink = doc.linkedApplications.find(link => link.applicationId === app.applicationId);
+          return {
+            documentId: doc.documentId,
+            type: doc.type,
+            originalName: doc.originalName,
+            url: doc.cloudinaryUrl, // Map cloudinaryUrl to url for frontend compatibility
+            status: appLink ? appLink.status : doc.overallStatus,
+            verifiedBy: appLink ? appLink.verifiedBy : null
+          };
+        });
+
+        return {
+          applicationId: app.applicationId,
+          applicant: {
+            name: app.applicantName,
+            mobile: app.applicantMobile,
+            userId: app.userId?.loginUserId
+          },
+          application: {
+            purpose: app.applicationData.purpose,
+            description: app.applicationData.description,
+            urgency: app.applicationData.urgency
+          },
+          status: app.status,
+          submittedAt: app.submittedAt,
+          currentAuthority: app.currentAuthority,
+          assignedAt: app.currentAuthority.assignedAt,
+          processingTime: Math.round((new Date() - app.submittedAt) / (1000 * 60 * 60)), // hours
+          documents: formattedDocuments, // Use the new documents from Document model
+          lastAction: app.processingChain[app.processingChain.length - 1] || null
+        };
       }));
 
       res.json({
@@ -366,6 +384,28 @@ class AuthorityController {
         });
       }
 
+      // Fetch documents linked to this application using the new Document model
+      const documents = await Document.find({
+        'linkedApplications.applicationId': applicationId
+      }).select('documentId type originalName cloudinaryUrl fileSizeBytes uploadedAt linkedApplications overallStatus');
+
+      // Format documents for the response
+      const formattedDocuments = documents.map(doc => {
+        const appLink = doc.linkedApplications.find(link => link.applicationId === applicationId);
+        return {
+          documentId: doc.documentId,
+          type: doc.type,
+          originalName: doc.originalName,
+          url: doc.cloudinaryUrl, // Map cloudinaryUrl to url for frontend compatibility
+          fileSize: doc.fileSizeBytes,
+          uploadedAt: doc.uploadedAt,
+          status: appLink ? appLink.status : doc.overallStatus,
+          verificationComments: appLink ? appLink.verificationComments : '',
+          verifiedBy: appLink ? appLink.verifiedBy : null,
+          verifiedAt: appLink ? appLink.verifiedAt : null
+        };
+      });
+
       res.json({
         success: true,
         application: {
@@ -383,7 +423,7 @@ class AuthorityController {
           completedAt: application.completedAt,
           totalProcessingTime: application.totalProcessingTime,
           authorityChanges: application.authorityChanges,
-          documents: application.documents,
+          documents: formattedDocuments, // Use the new documents from Document model
           processingHistory: application.getProcessingHistory()
         },
         requestedBy: req.session.authority.designation

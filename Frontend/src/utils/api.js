@@ -173,7 +173,40 @@ export const authorityAPI = {
   getEscalationOptions: () => API.get('/authority/data-verification/escalation-options')
 };
 
-// ===== FILE UPLOAD API =====
+// ===== DOCUMENT API =====
+
+export const documentAPI = {
+  // Upload new document
+  upload: (formData) => API.post('/documents/upload', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  }),
+  
+  // Get user's documents
+  getMyDocuments: (params) => API.get('/documents/my-documents', { params }),
+  
+  // Get documents for specific application
+  getApplicationDocuments: (applicationId) => API.get(`/documents/application/${applicationId}`),
+  
+  // Link existing document to application
+  linkToApplication: (documentId, applicationId, data) => 
+    API.post(`/documents/${documentId}/link/${applicationId}`, data),
+  
+  // Get reusable documents (verified documents)
+  getReusableDocuments: (types) => API.get('/documents/reusable', { 
+    params: types ? { types: types.join(',') } : {} 
+  }),
+  
+  // Delete document
+  deleteDocument: (documentId) => API.delete(`/documents/${documentId}`),
+  
+  // Verify document (authority only)
+  verifyDocument: (documentId, applicationId, data) => 
+    API.post(`/documents/${documentId}/verify/${applicationId}`, data)
+};
+
+// ===== FILE UPLOAD API (Legacy - use documentAPI.upload instead) =====
 
 export const uploadFile = (formData) => {
   return API.post('/upload', formData, {
