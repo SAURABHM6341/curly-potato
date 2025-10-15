@@ -55,16 +55,11 @@ API.interceptors.response.use(
     console.error('API Response Error:', error.response?.status, error.response?.data || error.message);
     
     if (error.response) {
-      // Handle 401 Unauthorized - Session expired
+      // Handle 401 Unauthorized - Let AuthContext handle logout/redirect
+      // Don't force redirect here - just let the error propagate
       if (error.response.status === 401) {
-        localStorage.removeItem('user');
-        localStorage.removeItem('tempToken');
-        
-        // Only redirect if not already on login page
-        if (!window.location.pathname.includes('/login') && 
-            !window.location.pathname.includes('/signup')) {
-          window.location.href = '/login';
-        }
+        // AuthContext will handle this via checkAuth()
+        console.log('401 Unauthorized - Session may be expired');
       }
       
       // Handle other common errors

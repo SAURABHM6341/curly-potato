@@ -55,6 +55,11 @@ class SessionAuth {
       });
     }
 
+    // Auto-renew session on each request to extend activity-based expiry
+    // Extend expiry by 24 hours from now
+    const newExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    req.session.user.expiresAt = newExpiresAt;
+
     // Attach user data to request
     req.user = req.session.user;
     next();
@@ -89,6 +94,10 @@ class SessionAuth {
         message: 'Your authority session has expired. Please log in again.'
       });
     }
+
+    // Auto-renew authority session on each request
+    const newExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    req.session.authority.expiresAt = newExpiresAt;
 
     // Attach authority data to request
     req.authority = req.session.authority;
