@@ -12,7 +12,7 @@ import Footer from '../components/Layout/Footer';
 import Spinner from '../components/Loader/Spinner';
 
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
-  const { user, loading } = useAuth();
+  const { user, loading, isAuthenticated } = useAuth();
 
   if (loading) {
     return (
@@ -30,7 +30,8 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
     );
   }
 
-  if (!user) {
+  // Check both user and isAuthenticated for security
+  if (!user || !isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 

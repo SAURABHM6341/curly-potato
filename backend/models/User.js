@@ -217,6 +217,7 @@ UserSchema.methods.recordLogin = function() {
 UserSchema.methods.getProfile = function() {
   return {
     userId: this.userId,
+    loginUserId: this.loginUserId, // Added for Navbar display
     name: this.name,
     dateOfBirth: this.dateOfBirth,
     age: this.age,

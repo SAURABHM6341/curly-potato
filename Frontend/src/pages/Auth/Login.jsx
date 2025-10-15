@@ -67,10 +67,8 @@ const Login = () => {
         await login(userWithRole);
         setToast({ message: 'Login successful!', type: 'success' });
         
-        // Small delay to ensure session is saved on backend
-        setTimeout(() => {
-          navigate(`/${role}/dashboard`);
-        }, 1500);
+        // Navigate immediately - session is already saved
+        navigate(`/${role}/dashboard`);
       }
     } catch (error) {
       setToast({ 
@@ -145,10 +143,8 @@ const Login = () => {
         await login(authorityData);
         setToast({ message: 'Authority login successful!', type: 'success' });
         
-        // Small delay to ensure session is saved on backend
-        setTimeout(() => {
-          navigate('/authority/dashboard');
-        }, 1500);
+        // Navigate immediately
+        navigate('/authority/dashboard');
       }
     } catch (error) {
       setToast({ 

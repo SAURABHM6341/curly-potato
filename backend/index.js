@@ -27,10 +27,30 @@ const documentRoutes = require('./routes/documents');
 // Initialize Express app
 const app = express();
 
-// Simple CORS configuration - Allow all origins with credentials
+// Trust proxy - Required for Render/Heroku/Railway deployments
+app.set('trust proxy', 1);
+
+// CORS configuration - Environment-aware
+const isProduction = process.env.NODE_ENV === 'production';
+const allowedOrigins = isProduction 
+  ? [
+      'https://curly-potato-two.vercel.app',
+      'https://curly-potato-tzpc.onrender.com'
+    ]
+  : ['http://localhost:5173', 'http://localhost:3000'];
+
 app.use(cors({
-  origin: true, // Allow any origin
-  credentials: true, // Allow cookies
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || !isProduction) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   optionsSuccessStatus: 200
@@ -40,8 +60,8 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Simple Session configuration - Works in both dev and production
-app.use(session({
+// Session configuration - Environment-aware for cross-origin support
+const sessionConfig = {
   secret: process.env.SESSION_SECRET || 'fallback-session-secret',
   resave: false,
   saveUninitialized: false,
@@ -52,12 +72,17 @@ app.use(session({
   }),
   cookie: {
     httpOnly: true,
-    secure: false, // Set to false to work in both HTTP and HTTPS
-    sameSite: 'lax', // Relaxed for better compatibility
+    // For cross-origin requests (localhost frontend to production backend)
+    // secure must be true and sameSite must be 'none'
+    secure: isProduction, // true in production (HTTPS required)
+    sameSite: isProduction ? 'none' : 'lax', // 'none' for cross-origin in production
     maxAge: parseInt(process.env.SESSION_MAX_AGE) || 86400000 // 24 hours
   },
   name: 'pcr_poa_session'
-}));
+};
+
+app.use(session(sessionConfig));
+console.log(`Session configured - Production: ${isProduction}, Secure: ${sessionConfig.cookie.secure}, SameSite: ${sessionConfig.cookie.sameSite}`);
 
 // Request logging middleware
 app.use((req, res, next) => {

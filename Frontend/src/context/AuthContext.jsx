@@ -56,27 +56,21 @@ export const AuthProvider = ({ children }) => {
         // Sync with localStorage for offline fallback
         localStorage.setItem('user', JSON.stringify(sessionData));
       } else {
-        // No valid session
-        logout();
+        // No valid session - just clear state, don't call logout API
+        setUser(null);
+        setIsAuthenticated(false);
+        localStorage.removeItem('user');
+        localStorage.removeItem('tempToken');
       }
     } catch (error) {
       console.error('Auth check failed:', error);
       
-      // Try localStorage as fallback, but still validate
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        try {
-          const userData = JSON.parse(storedUser);
-          // Don't set as authenticated until session is validated
-          setUser(userData);
-          setIsAuthenticated(false);
-        } catch (parseError) {
-          console.error('Failed to parse stored user data:', parseError);
-          logout();
-        }
-      } else {
-        logout();
-      }
+      // Don't logout on network errors - just clear authenticated state
+      // This prevents auto-logout on temporary network issues or CORS problems
+      setUser(null);
+      setIsAuthenticated(false);
+      localStorage.removeItem('user');
+      localStorage.removeItem('tempToken');
     } finally {
       setLoading(false);
     }
