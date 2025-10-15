@@ -194,7 +194,7 @@ app.use((req, res) => {
 // Global error handler
 app.use((err, req, res, next) => {
   console.error('🚨 Global Error Handler:', err);
-  
+
   // Handle specific error types
   if (err.name === 'ValidationError') {
     return res.status(400).json({
@@ -246,81 +246,21 @@ process.on('SIGINT', async () => {
 // Start server
 async function startServer() {
   try {
-    // Connect to database
     await database.connect();
-    
-    // Start listening
-    const server = app.listen(config.port, () => {
+
+    const PORT = config.port;
+
+    app.listen(PORT, () => {
       console.log('🚀 MERN Multi-Step Signup Backend Started');
-      console.log(`📡 Server running on http://localhost:${config.port}`);
+      console.log(`📡 Server running on port ${PORT}`); // Use port from config
       console.log(`🌍 Environment: ${config.nodeEnv}`);
       console.log(`📊 Database: ${database.isConnected() ? '✅ Connected' : '❌ Disconnected'}`);
       console.log(`🔐 JWT: ${config.jwt.secret ? '✅ Configured' : '⚠️ Using fallback'}`);
-      console.log('📋 Available Endpoints:');
-      console.log('   ===== HEALTH & INFO =====');
-      console.log('   GET  / - Health check & API info');
-      console.log('');
-      console.log('   ===== SIGNUP FLOW =====');
-      console.log('   POST /auth/request-mobile-otp - Request mobile OTP');
-      console.log('   POST /auth/verify-mobile-otp - Verify mobile OTP');
-      console.log('   POST /auth/aadhaar/initiate - Initiate Aadhaar verification');
-      console.log('   POST /auth/aadhaar/verify - Verify Aadhaar OTP & create account');
-      console.log('   POST /auth/resend-otp - Resend OTP');
-      console.log('');
-      console.log('   ===== LOGIN FLOW =====');
-      console.log('   POST /auth/login - Initiate login (Aadhaar or User ID)');
-      console.log('   POST /auth/verify-login-otp - Verify login OTP');
-      console.log('   POST /auth/login-password - Login with User ID & password');
-      console.log('   POST /auth/authority/login - Authority login');
-      console.log('   GET  /auth/session - Get current session info');
-      console.log('   POST /auth/logout - Logout (destroys session)');
-      console.log('');
-      console.log('   ===== USER ROUTES =====');
-      console.log('   GET  /users/profile - Get user profile');
-      console.log('   PUT  /users/profile - Update user profile');
-      console.log('   GET  /users/dashboard - Get dashboard data');
-      console.log('   GET  /users/stats - Get account statistics');
-      console.log('   GET  /users/validate-token - Validate JWT token');
-      console.log('   POST /users/deactivate - Deactivate account');
-      console.log('');
-      console.log('   ===== AUTHORITY ROUTES =====');
-      console.log('   POST /authority/login - Authority login (alternative)');
-      console.log('   GET  /authority/dashboard - Authority dashboard with real stats');
-      console.log('   GET  /authority/applications/pending - Get real pending applications');
-      console.log('   GET  /authority/applications/:id - Get application details & history');
-      console.log('   POST /authority/applications/:id/review - Review/forward applications');
-      console.log('   GET  /authority/forwarding-options - Get valid forwarding targets');
-      console.log('   POST /authority/applications/create-test - Create test application');
-      console.log('   POST /authority/create - Create new authority (admin only)');
-      console.log('   GET  /authority/list - List all authorities (admin only)');
-      console.log('');
-      console.log('🧪 Testing Notes:');
-      console.log('   - All OTPs are logged to console for testing');
-      console.log('   - Aadhaar verification is fully mocked');
-      console.log('   - Session-based authentication (no JWT tokens needed)');
-      console.log('   - Mobile format: +91XXXXXXXXXX');
-      console.log('   - Aadhaar format: 12 digits, not starting with 0 or 1');
-      console.log('   - Authority login: Use predefined designations');
-      console.log('   - Cookie-based sessions with 24hr expiry');
-      console.log('');
     });
-
-    // Handle server errors
-    server.on('error', (error) => {
-      if (error.code === 'EADDRINUSE') {
-        console.error(`❌ Port ${config.port} is already in use`);
-        process.exit(1);
-      } else {
-        console.error('❌ Server error:', error);
-        process.exit(1);
-      }
-    });
-
   } catch (error) {
     console.error('❌ Failed to start server:', error);
     process.exit(1);
   }
 }
 
-// Start the server
 startServer();
