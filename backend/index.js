@@ -29,7 +29,7 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: ['http://localhost:3000', 'http://localhost:5173'], // React/Vite dev servers
+  origin: ['http://localhost:3000', 'http://localhost:5173', 'https://curly-potato-two.vercel.app'], // React/Vite dev servers
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
