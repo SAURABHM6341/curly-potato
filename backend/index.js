@@ -27,20 +27,20 @@ const documentRoutes = require('./routes/documents');
 // Initialize Express app
 const app = express();
 
-// CORS configuration
-const corsOptions = {
-  origin: ['http://localhost:3000', 'http://localhost:5173', 'https://curly-potato-two.vercel.app'], // React/Vite dev servers
+// Simple CORS configuration - Allow all origins with credentials
+app.use(cors({
+  origin: true, // Allow any origin
+  credentials: true, // Allow cookies
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-};
+  optionsSuccessStatus: 200
+}));
 
 // Global middleware
-app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Session configuration
+// Simple Session configuration - Works in both dev and production
 app.use(session({
   secret: process.env.SESSION_SECRET || 'fallback-session-secret',
   resave: false,
@@ -51,12 +51,12 @@ app.use(session({
     ttl: parseInt(process.env.SESSION_MAX_AGE) / 1000 || 86400 // 24 hours
   }),
   cookie: {
-    httpOnly: true, // Prevent XSS attacks
-    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-    sameSite: 'strict', // CSRF protection
+    httpOnly: true,
+    secure: false, // Set to false to work in both HTTP and HTTPS
+    sameSite: 'lax', // Relaxed for better compatibility
     maxAge: parseInt(process.env.SESSION_MAX_AGE) || 86400000 // 24 hours
   },
-  name: 'pcr_poa_session' // Custom session name
+  name: 'pcr_poa_session'
 }));
 
 // Request logging middleware
@@ -249,13 +249,15 @@ async function startServer() {
     await database.connect();
 
     const PORT = config.port;
+    const HOST = process.env.HOST || '0.0.0.0'; // Bind to 0.0.0.0 for deployment platforms
 
-    app.listen(PORT, () => {
+    app.listen(PORT, HOST, () => {
       console.log('🚀 MERN Multi-Step Signup Backend Started');
-      console.log(`📡 Server running on port ${PORT}`); // Use port from config
+      console.log(`📡 Server running on ${HOST}:${PORT}`);
       console.log(`🌍 Environment: ${config.nodeEnv}`);
       console.log(`📊 Database: ${database.isConnected() ? '✅ Connected' : '❌ Disconnected'}`);
       console.log(`🔐 JWT: ${config.jwt.secret ? '✅ Configured' : '⚠️ Using fallback'}`);
+      console.log(`🍪 Session: ${process.env.SESSION_SECRET ? '✅ Configured' : '⚠️ Using fallback'}`);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);
