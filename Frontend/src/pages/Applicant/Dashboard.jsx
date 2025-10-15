@@ -12,6 +12,16 @@ import TagButton from '../../components/Button/TagButton';
 import Spinner from '../../components/Loader/Spinner';
 import NoData from '../../components/EmptyState/NoData';
 import Toast from '../../components/Alerts/Toast';
+import { 
+  FaClipboardList, 
+  FaClock, 
+  FaCheck, 
+  FaTimes, 
+  FaBullseye, 
+  FaChartBar, 
+  FaFolder, 
+  FaFileAlt 
+} from 'react-icons/fa';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -64,7 +74,7 @@ const Dashboard = () => {
       <div className="dashboard-stats">
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'rgba(0,86,210,0.1)', color: '#0056D2' }}>
-            📋
+            <FaClipboardList />
           </div>
           <div className="stat-content">
             <p className="stat-label">Total Applications</p>
@@ -74,7 +84,7 @@ const Dashboard = () => {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'rgba(244,180,0,0.1)', color: '#F4B400' }}>
-            ⏳
+            <FaClock />
           </div>
           <div className="stat-content">
             <p className="stat-label">Pending</p>
@@ -84,7 +94,7 @@ const Dashboard = () => {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'rgba(15,157,88,0.1)', color: '#0F9D58' }}>
-            ✓
+            <FaCheck />
           </div>
           <div className="stat-content">
             <p className="stat-label">Approved</p>
@@ -94,7 +104,7 @@ const Dashboard = () => {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'rgba(217,48,37,0.1)', color: '#D93025' }}>
-            ✕
+            <FaTimes />
           </div>
           <div className="stat-content">
             <p className="stat-label">Rejected</p>
@@ -111,7 +121,7 @@ const Dashboard = () => {
             className="action-card"
             onClick={() => navigate('/applicant/schemes')}
           >
-            <span className="action-icon">🎯</span>
+            <span className="action-icon"><FaBullseye /></span>
             <h3 className="action-title">Apply for Scheme</h3>
             <p className="action-description">Browse and apply for government schemes</p>
           </button>
@@ -120,7 +130,7 @@ const Dashboard = () => {
             className="action-card"
             onClick={() => navigate('/applicant/applications')}
           >
-            <span className="action-icon">📊</span>
+            <span className="action-icon"><FaChartBar /></span>
             <h3 className="action-title">My Applications</h3>
             <p className="action-description">View and track your applications</p>
           </button>
@@ -129,7 +139,7 @@ const Dashboard = () => {
             className="action-card"
             onClick={() => navigate('/applicant/documents')}
           >
-            <span className="action-icon">📁</span>
+            <span className="action-icon"><FaFolder /></span>
             <h3 className="action-title">Upload Documents</h3>
             <p className="action-description">Upload required documents</p>
           </button>
@@ -138,7 +148,7 @@ const Dashboard = () => {
             className="action-card"
             onClick={() => navigate('/applicant/applications')}
           >
-            <span className="action-icon">📝</span>
+            <span className="action-icon"><FaFileAlt /></span>
             <h3 className="action-title">My Applications</h3>
             <p className="action-description">View all your applications</p>
           </button>

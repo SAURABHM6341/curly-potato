@@ -12,6 +12,7 @@ import TextInput from '../../components/Input/TextInput';
 import Spinner from '../../components/Loader/Spinner';
 import NoData from '../../components/EmptyState/NoData';
 import { useToast } from '../../context/ToastContext';
+import { FaSearch, FaClipboardList, FaFileAlt } from 'react-icons/fa';
 import './PendingApprovals.css';
 
 const AllApplications = () => {
@@ -94,7 +95,7 @@ const AllApplications = () => {
             placeholder="Search by ID, scheme, or applicant..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            icon="🔍"
+            icon={<FaSearch />}
           />
         </div>
         
@@ -103,14 +104,14 @@ const AllApplications = () => {
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
           options={[
-            { value: 'all', label: '📋 All Applications' },
-            { value: 'data_verification', label: '📝 Data Verification' },
-            { value: 'under_review', label: '👁️ Under Review' },
-            { value: 'pending_documents', label: '📄 Pending Documents' },
-            { value: 'on_hold', label: '⏸️ On Hold' },
-            { value: 'accepted', label: '✅ Accepted' },
-            { value: 'approved', label: '✅ Approved' },
-            { value: 'rejected', label: '❌ Rejected' }
+            { value: 'all', label: 'All Applications' },
+            { value: 'data_verification', label: 'Data Verification' },
+            { value: 'under_review', label: 'Under Review' },
+            { value: 'pending_documents', label: 'Pending Documents' },
+            { value: 'on_hold', label: 'On Hold' },
+            { value: 'accepted', label: 'Accepted' },
+            { value: 'approved', label: 'Approved' },
+            { value: 'rejected', label: 'Rejected' }
           ]}
         />
         

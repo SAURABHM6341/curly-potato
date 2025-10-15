@@ -12,6 +12,16 @@ import PrimaryButton from '../../components/Button/PrimaryButton';
 import Spinner from '../../components/Loader/Spinner';
 import NoData from '../../components/EmptyState/NoData';
 import { useToast } from '../../context/ToastContext';
+import { 
+  FaChartBar, 
+  FaClock, 
+  FaClipboardList, 
+  FaFolder, 
+  FaFileAlt, 
+  FaLightbulb,
+  FaCheck,
+  FaUser
+} from 'react-icons/fa';
 import './AuthorityDashboard.css';
 
 const AuthorityDashboard = () => {
@@ -82,7 +92,7 @@ const AuthorityDashboard = () => {
         </div>
 
         <div className="stat-card stat-reviewed">
-          <div className="stat-icon">✅</div>
+          <div className="stat-icon"><FaCheck /></div>
           <div className="stat-info">
             <span className="stat-value">{stats?.processedToday || 0}</span>
             <span className="stat-label">Reviewed Today</span>
@@ -90,7 +100,7 @@ const AuthorityDashboard = () => {
         </div>
 
         <div className="stat-card stat-total">
-          <div className="stat-icon">📊</div>
+          <div className="stat-icon"><FaChartBar /></div>
           <div className="stat-info">
             <span className="stat-value">{stats?.totalApplications || 0}</span>
             <span className="stat-label">Total Processed</span>
@@ -98,7 +108,7 @@ const AuthorityDashboard = () => {
         </div>
 
         <div className="stat-card stat-avg-time">
-          <div className="stat-icon">⏱️</div>
+          <div className="stat-icon"><FaClock /></div>
           <div className="stat-info">
             <span className="stat-value">{dashboard?.workload?.high_priority || 0}</span>
             <span className="stat-label">High Priority</span>
@@ -118,7 +128,7 @@ const AuthorityDashboard = () => {
               onClick={() => navigate('/authority/data-verification')}
             >
               <div className="action-icon" style={{ background: 'rgba(15, 157, 88, 0.1)' }}>
-                ✓
+                <FaCheck />
               </div>
               <h3>Data Verification</h3>
               <p>Verify application completeness and escalate to reviewers</p>
@@ -132,7 +142,7 @@ const AuthorityDashboard = () => {
               onClick={() => navigate('/authority/pending')}
             >
               <div className="action-icon" style={{ background: 'rgba(244, 180, 0, 0.1)' }}>
-                📋
+                <FaClipboardList />
               </div>
               <h3>Pending Approvals</h3>
               <p>Review applications waiting for your approval</p>
@@ -146,7 +156,7 @@ const AuthorityDashboard = () => {
               onClick={() => navigate('/authority/applications')}
             >
               <div className="action-icon" style={{ background: 'rgba(0, 86, 210, 0.1)' }}>
-                📂
+                <FaFolder />
               </div>
               <h3>All Applications</h3>
               <p>View all applications in your jurisdiction</p>
@@ -160,7 +170,7 @@ const AuthorityDashboard = () => {
               onClick={() => navigate('/authority/history')}
             >
               <div className="action-icon" style={{ background: 'rgba(15, 157, 88, 0.1)' }}>
-                📜
+                <FaFileAlt />
               </div>
               <h3>Review History</h3>
               <p>View your past reviews and decisions</p>
@@ -174,7 +184,7 @@ const AuthorityDashboard = () => {
               onClick={() => navigate('/authority/profile')}
             >
               <div className="action-icon" style={{ background: 'rgba(0, 86, 210, 0.1)' }}>
-                👤
+                <FaUser />
               </div>
               <h3>My Profile</h3>
               <p>View and update your profile information</p>
@@ -242,7 +252,7 @@ const AuthorityDashboard = () => {
         </div>
 
         <div className="info-card tips-card">
-          <h3>💡 Tips</h3>
+          <h3><FaLightbulb /> Tips</h3>
           <ul className="tips-list">
             {user?.accessLevel >= 3 ? (
               <>

@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { FaEnvelope, FaPhone, FaClock } from 'react-icons/fa';
 import './Layout.css';
 
 const Footer = () => {
@@ -43,9 +44,9 @@ const Footer = () => {
           <div className="footer-section">
             <h4 className="footer-subtitle">Contact</h4>
             <ul className="footer-links">
-              <li className="footer-contact">📧 support@gov.in</li>
-              <li className="footer-contact">📞 1800-XXX-XXXX</li>
-              <li className="footer-contact">🕐 Mon-Fri: 9AM-6PM</li>
+              <li className="footer-contact"><FaEnvelope /> support@gov.in</li>
+              <li className="footer-contact"><FaPhone /> 1800-XXX-XXXX</li>
+              <li className="footer-contact"><FaClock /> Mon-Fri: 9AM-6PM</li>
             </ul>
           </div>
         </div>

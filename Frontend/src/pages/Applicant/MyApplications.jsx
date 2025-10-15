@@ -11,6 +11,13 @@ import TextInput from '../../components/Input/TextInput';
 import Spinner from '../../components/Loader/Spinner';
 import NoData from '../../components/EmptyState/NoData';
 import { useToast } from '../../context/ToastContext';
+import { 
+  FaChartBar, 
+  FaClock, 
+  FaCheckCircle, 
+  FaTimesCircle, 
+  FaSearch 
+} from 'react-icons/fa';
 import './MyApplications.css';
 
 const MyApplications = () => {
@@ -75,7 +82,7 @@ const MyApplications = () => {
       {/* Stats Cards */}
       <div className="applications-stats">
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(0, 86, 210, 0.1)' }}>📊</div>
+          <div className="stat-icon" style={{ background: 'rgba(0, 86, 210, 0.1)' }}><FaChartBar /></div>
           <div className="stat-info">
             <span className="stat-value">{stats.total}</span>
             <span className="stat-label">Total Applications</span>
@@ -83,7 +90,7 @@ const MyApplications = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(244, 180, 0, 0.1)' }}>⏳</div>
+          <div className="stat-icon" style={{ background: 'rgba(244, 180, 0, 0.1)' }}><FaClock /></div>
           <div className="stat-info">
             <span className="stat-value">{stats.pending}</span>
             <span className="stat-label">Pending</span>
@@ -91,7 +98,7 @@ const MyApplications = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(15, 157, 88, 0.1)' }}>✅</div>
+          <div className="stat-icon" style={{ background: 'rgba(15, 157, 88, 0.1)' }}><FaCheckCircle /></div>
           <div className="stat-info">
             <span className="stat-value">{stats.approved}</span>
             <span className="stat-label">Approved</span>
@@ -99,7 +106,7 @@ const MyApplications = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(217, 48, 37, 0.1)' }}>❌</div>
+          <div className="stat-icon" style={{ background: 'rgba(217, 48, 37, 0.1)' }}><FaTimesCircle /></div>
           <div className="stat-info">
             <span className="stat-value">{stats.rejected}</span>
             <span className="stat-label">Rejected</span>
@@ -114,7 +121,7 @@ const MyApplications = () => {
             placeholder="Search by ID or scheme..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            icon="🔍"
+            icon={<FaSearch />}
           />
         </div>
         
@@ -142,7 +149,7 @@ const MyApplications = () => {
           />
         ) : (
           <div className="no-results">
-            <div className="no-results-icon">🔍</div>
+            <div className="no-results-icon"><FaSearch /></div>
             <h3>No matching applications</h3>
             <p>Try adjusting your search or filters</p>
           </div>

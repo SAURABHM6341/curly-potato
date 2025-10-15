@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaSearch } from 'react-icons/fa';
 import PrimaryButton from '../components/Button/PrimaryButton';
 import './NotFound.css';
 
@@ -29,7 +30,9 @@ const NotFound = () => {
         </div>
 
         <div className="error-illustration">
-          <span className="illustration-emoji">🔍</span>
+          <span className="illustration-emoji">
+            <FaSearch />
+          </span>
           <p>We searched everywhere but couldn't find this page.</p>
         </div>
       </div>

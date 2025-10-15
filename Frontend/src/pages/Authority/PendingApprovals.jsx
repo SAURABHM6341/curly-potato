@@ -12,6 +12,7 @@ import TextInput from '../../components/Input/TextInput';
 import Spinner from '../../components/Loader/Spinner';
 import NoData from '../../components/EmptyState/NoData';
 import { useToast } from '../../context/ToastContext';
+import { FaSearch } from 'react-icons/fa';
 import './PendingApprovals.css';
 
 const PendingApprovals = () => {
@@ -91,7 +92,7 @@ const PendingApprovals = () => {
             placeholder="Search by ID, scheme, or applicant..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            icon="🔍"
+            icon={<FaSearch />}
           />
         </div>
         
@@ -115,7 +116,7 @@ const PendingApprovals = () => {
           />
         ) : (
           <div className="no-results">
-            <div className="no-results-icon">🔍</div>
+            <div className="no-results-icon"><FaSearch /></div>
             <h3>No matching applications</h3>
             <p>Try adjusting your search or filters</p>
           </div>

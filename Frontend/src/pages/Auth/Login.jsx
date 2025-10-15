@@ -55,15 +55,22 @@ const Login = () => {
       const response = await authAPI.loginPassword(passwordForm);
       
       if (response.data.success) {
+        // Determine user role and prepare user object (same as OTP flow)
+        const role = response.data.user.authorityId ? 'authority' : 'applicant';
+        const userWithRole = {
+          ...response.data.user,
+          role: role,
+          isAuthority: role === 'authority'
+        };
+        
         // Store user data and redirect
-        await login(response.data.user);
+        await login(userWithRole);
         setToast({ message: 'Login successful!', type: 'success' });
         
-        // Redirect based on role
+        // Small delay to ensure session is saved on backend
         setTimeout(() => {
-          const role = response.data.user.authorityId ? 'authority' : 'applicant';
           navigate(`/${role}/dashboard`);
-        }, 1000);
+        }, 1500);
       }
     } catch (error) {
       setToast({ 
@@ -138,10 +145,10 @@ const Login = () => {
         await login(authorityData);
         setToast({ message: 'Authority login successful!', type: 'success' });
         
-        // Redirect to authority dashboard
+        // Small delay to ensure session is saved on backend
         setTimeout(() => {
           navigate('/authority/dashboard');
-        }, 1000);
+        }, 1500);
       }
     } catch (error) {
       setToast({ 
@@ -155,6 +162,50 @@ const Login = () => {
 
   return (
     <div className="auth-container">
+      {/* Login Helper - Moved to separate column */}
+      <div className="login-helper-sidebar">
+        <div className="login-helper">
+          <h3 className="login-helper-title">Test Login Credentials</h3>
+          
+          <div className="login-helper-section">
+            <h4 className="login-helper-subtitle">Authority Accounts</h4>
+            <div className="login-helper-accounts">
+              <div className="login-helper-account">
+                <span className="login-helper-label">District Collector:</span>
+                <span className="login-helper-value">District_Collector_Delhi</span>
+                <span className="login-helper-password">Admin@123</span>
+              </div>
+              <div className="login-helper-account">
+                <span className="login-helper-label">Assistant Collector:</span>
+                <span className="login-helper-value">Assistant_Collector_North</span>
+                <span className="login-helper-password">Reviewer@123</span>
+              </div>
+              <div className="login-helper-account">
+                <span className="login-helper-label">Tehsildar:</span>
+                <span className="login-helper-value">Tehsildar_CP_Zone</span>
+                <span className="login-helper-password">Tehsil@123</span>
+              </div>
+              <div className="login-helper-account">
+                <span className="login-helper-label">Data Entry:</span>
+                <span className="login-helper-value">Data_Entry_Operator</span>
+                <span className="login-helper-password">Operator@123</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="login-helper-section">
+            <h4 className="login-helper-subtitle">User Account</h4>
+            <div className="login-helper-accounts">
+              <div className="login-helper-account">
+                <span className="login-helper-label">Test User:</span>
+                <span className="login-helper-value">USER_716962</span>
+                <span className="login-helper-password">8xhKKvMD</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="auth-card">
         {/* Header */}
         <div className="auth-header">

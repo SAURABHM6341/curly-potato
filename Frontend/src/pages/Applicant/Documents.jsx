@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { FaIdCard, FaHome, FaDollarSign, FaFileAlt, FaUpload, FaTimes, FaCheckCircle, FaClipboardList } from 'react-icons/fa';
 import { applicationAPI } from '../../utils/api';
 import { useToast } from '../../context/ToastContext';
 import PrimaryButton from '../../components/Button/PrimaryButton';
@@ -207,10 +208,10 @@ function Documents() {
 
   const getDocumentIcon = (type) => {
     switch (type) {
-      case 'aadhaar': return '🆔';
-      case 'address_proof': return '🏠';
-      case 'income_proof': return '💰';
-      default: return '📄';
+      case 'aadhaar': return <FaIdCard />;
+      case 'address_proof': return <FaHome />;
+      case 'income_proof': return <FaDollarSign />;
+      default: return <FaFileAlt />;
     }
   };
 
@@ -347,7 +348,7 @@ function Documents() {
       <div className="documents-content">
         <div className="documents-summary">
           <div className="summary-card">
-            <h3>📋 Your Applications</h3>
+            <h3><FaClipboardList /> Your Applications</h3>
             <div className="applications-list">
               {applications.map(app => (
                 <div key={app.applicationId} className="app-summary-item">
@@ -361,10 +362,10 @@ function Documents() {
         </div>
 
         <div className="documents-requirements">
-          {renderDocumentSection('identity', '🆔 Identity Documents', requiredDocuments.identity)}
-          {renderDocumentSection('address', '🏠 Address Proof Documents', requiredDocuments.address)}
-          {renderDocumentSection('purpose_specific', '💰 Purpose-Specific Documents', requiredDocuments.purpose_specific)}
-          {renderDocumentSection('supporting', '📄 Supporting Documents', requiredDocuments.supporting)}
+          {renderDocumentSection('identity', 'Identity Documents', requiredDocuments.identity)}
+          {renderDocumentSection('address', 'Address Proof Documents', requiredDocuments.address)}
+          {renderDocumentSection('purpose_specific', 'Purpose-Specific Documents', requiredDocuments.purpose_specific)}
+          {renderDocumentSection('supporting', 'Supporting Documents', requiredDocuments.supporting)}
         </div>
       </div>
     </div>

@@ -93,6 +93,9 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('tempToken', tempToken);
       }
       
+      // Don't immediately call checkAuth after login to avoid race condition
+      // The user data is already set from the login response
+      
       return true;
     } catch (error) {
       console.error('Login failed:', error);

@@ -3,11 +3,13 @@
  * Defines all available schemes with their forms and requirements
  */
 
+import { FaGraduationCap, FaTruck, FaBriefcase, FaUserAlt, FaHome } from 'react-icons/fa';
+
 export const SCHEMES = [
   {
     id: "scheme_1",
     name: "Education Grant Scheme",
-    icon: "🎓",
+    icon: FaGraduationCap,
     description: "Provides financial assistance to students under DBT program for educational expenses including tuition fees, books, and study materials.",
     category: "education",
     benefits: "Up to ₹50,000 financial assistance for tuition and study materials",
@@ -29,7 +31,7 @@ export const SCHEMES = [
   {
     id: "scheme_2",
     name: "Agriculture Equipment Subsidy",
-    icon: "🚜",
+    icon: FaTruck,
     description: "Subsidy for farmers purchasing approved agricultural equipment to enhance farming productivity and modernization.",
     category: "agriculture",
     benefits: "Up to ₹1,00,000 subsidy on approved agricultural equipment",
@@ -50,7 +52,7 @@ export const SCHEMES = [
   {
     id: "scheme_3",
     name: "Women Entrepreneurship Support",
-    icon: "👩‍💼",
+    icon: FaBriefcase,
     description: "Financial support and training for women entrepreneurs starting or expanding small businesses.",
     category: "women welfare",
     benefits: "Up to ₹2,00,000 for business setup and training programs",
@@ -72,7 +74,7 @@ export const SCHEMES = [
   {
     id: "scheme_4",
     name: "Senior Citizen Pension Scheme",
-    icon: "👴",
+    icon: FaUserAlt,
     description: "Monthly pension support for senior citizens below poverty line to ensure financial security.",
     category: "social welfare",
     benefits: "₹1,000 per month pension support",
@@ -93,7 +95,7 @@ export const SCHEMES = [
   {
     id: "scheme_5",
     name: "Housing Assistance Program",
-    icon: "🏠",
+    icon: FaHome,
     description: "Financial assistance for construction or renovation of houses for economically weaker sections.",
     category: "housing",
     benefits: "Up to ₹3,00,000 for house construction or renovation",

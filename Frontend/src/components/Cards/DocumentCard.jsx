@@ -4,16 +4,17 @@
  */
 
 import React from 'react';
+import { FaFilePdf, FaImage, FaPaperclip } from 'react-icons/fa';
 import './Cards.css';
 
 const DocumentCard = ({ document, onDownload, onDelete, showActions = true }) => {
   const getFileIcon = (type) => {
     const icons = {
-      'application/pdf': '📄',
-      'image/jpeg': '🖼️',
-      'image/png': '🖼️',
-      'image/jpg': '🖼️',
-      'default': '📎'
+      'application/pdf': <FaFilePdf />,
+      'image/jpeg': <FaImage />,
+      'image/png': <FaImage />,
+      'image/jpg': <FaImage />,
+      'default': <FaPaperclip />
     };
     return icons[type] || icons.default;
   };

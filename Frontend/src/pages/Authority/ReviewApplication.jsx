@@ -5,6 +5,25 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { 
+  FaFileAlt, 
+  FaUser, 
+  FaSearch, 
+  FaCheckCircle, 
+  FaPaperclip, 
+  FaExclamationTriangle,
+  FaHome,
+  FaScroll,
+  FaDollarSign,
+  FaIdCard,
+  FaEye,
+  FaCalendarAlt,
+  FaClipboardList,
+  FaArrowRight,
+  FaArrowUp,
+  FaSync,
+  FaClock
+} from 'react-icons/fa';
 import { authorityAPI } from '../../utils/api';
 import StatusTag from '../../components/Cards/StatusTag';
 import DocumentCard from '../../components/Cards/DocumentCard';
@@ -40,9 +59,9 @@ const ReviewApplication = () => {
     setLoading(true);
     try {
       const response = await authorityAPI.getApplication(applicationId);
-      console.log('📄 Application data received:', response.data.application);
-      console.log('👤 Applicant name:', response.data.application?.applicantName);
-      console.log('👤 Applicant object:', response.data.application?.applicant);
+      console.log('Application data received:', response.data.application);
+      console.log('Applicant name:', response.data.application?.applicantName);
+      console.log('Applicant object:', response.data.application?.applicant);
       setApplication(response.data.application);
     } catch (error) {
       console.error('Fetch error:', error);
@@ -56,7 +75,7 @@ const ReviewApplication = () => {
   const fetchHigherAuthorities = async () => {
     try {
       const response = await authorityAPI.getForwardingOptions();
-      console.log('🔍 Forwarding options:', response.data);
+      console.log('Forwarding options:', response.data);
       const options = response.data.forwardingOptions || [];
       setHigherAuthorities(options.map(opt => ({
         designation: opt.designation,
@@ -69,7 +88,7 @@ const ReviewApplication = () => {
   };
 
   const handleAction = (action) => {
-    console.log('🎯 handleAction called with:', action);
+    console.log('handleAction called with:', action);
     
     // Only validate forward action for selected authority
     if (action === 'forward' && !selectedAuthority) {
@@ -78,7 +97,7 @@ const ReviewApplication = () => {
     }
     
     // Don't validate reject here - let modal handle it
-    console.log('✅ Opening modal for action:', action);
+    console.log('Opening modal for action:', action);
     setModalAction(action);
     setShowModal(true);
   };
@@ -209,9 +228,13 @@ const ReviewApplication = () => {
 
       {/* Documents Verification Section - ALWAYS SHOW FOR TEHSILDAR */}
       <div className="review-section">
-        <h2 className="section-title">📎 Document Verification</h2>
+        <h2 className="section-title">
+          <FaPaperclip style={{ marginRight: '8px' }} />
+          Document Verification
+        </h2>
         <p className="section-subtitle">
-          <strong>⚠️ IMPORTANT:</strong> Verify all documents carefully before approving the application
+          <FaExclamationTriangle style={{ marginRight: '8px', color: '#f4b400' }} />
+          <strong>IMPORTANT:</strong> Verify all documents carefully before approving the application
         </p>
         
         {application.documents && application.documents.length > 0 ? (
@@ -222,10 +245,10 @@ const ReviewApplication = () => {
                   <div className="doc-header">
                     <div className="doc-info">
                       <span className="doc-icon">
-                        {doc.type.includes('address') || doc.type.includes('domicile') ? '🏠' :
-                         doc.type.includes('caste') ? '📜' :
-                         doc.type.includes('income') ? '💰' :
-                         doc.type.includes('aadhaar') ? '🆔' : '📄'}
+                        {doc.type.includes('address') || doc.type.includes('domicile') ? <FaHome /> :
+                         doc.type.includes('caste') ? <FaScroll /> :
+                         doc.type.includes('income') ? <FaDollarSign /> :
+                         doc.type.includes('aadhaar') ? <FaIdCard /> : <FaFileAlt />}
                       </span>
                       <div>
                         <h3 className="doc-title">{doc.type.replace(/_/g, ' ').toUpperCase()}</h3>
@@ -242,40 +265,69 @@ const ReviewApplication = () => {
                         }
                       }}
                     >
-                      👁️ View Document
+                      <FaEye style={{ marginRight: '4px' }} />
+                      View Document
                     </SecondaryButton>
                   </div>
                   
                   {doc.uploadedAt && (
-                    <p className="doc-meta">📅 Uploaded: {formatDate(doc.uploadedAt)}</p>
+                    <p className="doc-meta">
+                      <FaCalendarAlt style={{ marginRight: '4px' }} />
+                      Uploaded: {formatDate(doc.uploadedAt)}
+                    </p>
                   )}
                   
                   {doc.verifiedBy ? (
-                    <p className="doc-meta verified">✅ Verified by: {doc.verifiedBy}</p>
+                    <p className="doc-meta verified">
+                      <FaCheckCircle style={{ marginRight: '4px' }} />
+                      Verified by: {doc.verifiedBy}
+                    </p>
                   ) : (
-                    <p className="doc-meta pending">⏳ Pending verification</p>
+                    <p className="doc-meta pending">
+                      <FaClock style={{ marginRight: '4px' }} />
+                      Pending verification
+                    </p>
                   )}
                 </div>
               ))}
             </div>
             
             <div className="verification-checklist">
-              <h3>🔍 Document Verification Checklist</h3>
+              <h3>
+                <FaSearch style={{ marginRight: '8px' }} />
+                Document Verification Checklist
+              </h3>
               <ul className="checklist-items">
-                <li>✓ <strong>Domicile Certificate</strong> - Valid and from recognized authority</li>
-                <li>✓ <strong>Caste Certificate</strong> - Matches applicant details and is authentic</li>
-                <li>✓ <strong>Income Certificate</strong> - Recent (within 6 months) and verifiable</li>
-                <li>✓ <strong>All documents</strong> are clear, legible and properly scanned</li>
-                <li>✓ <strong>Information matches</strong> across all documents</li>
+                <li>
+                  <FaCheckCircle style={{ marginRight: '4px', color: '#0f9d58' }} />
+                  <strong>Domicile Certificate</strong> - Valid and from recognized authority
+                </li>
+                <li>
+                  <FaCheckCircle style={{ marginRight: '4px', color: '#0f9d58' }} />
+                  <strong>Caste Certificate</strong> - Matches applicant details and is authentic
+                </li>
+                <li>
+                  <FaCheckCircle style={{ marginRight: '4px', color: '#0f9d58' }} />
+                  <strong>Income Certificate</strong> - Recent (within 6 months) and verifiable
+                </li>
+                <li>
+                  <FaCheckCircle style={{ marginRight: '4px', color: '#0f9d58' }} />
+                  <strong>All documents</strong> are clear, legible and properly scanned
+                </li>
+                <li>
+                  <FaCheckCircle style={{ marginRight: '4px', color: '#0f9d58' }} />
+                  <strong>Information matches</strong> across all documents
+                </li>
               </ul>
               <div className="verification-warning">
-                ⚠️ <strong>Note:</strong> Only approve if ALL documents are verified and authentic
+                <FaExclamationTriangle style={{ marginRight: '4px', color: '#f4b400' }} />
+                <strong>Note:</strong> Only approve if ALL documents are verified and authentic
               </div>
             </div>
           </>
         ) : (
           <div className="no-documents-warning">
-            <div className="warning-icon">⚠️</div>
+            <div className="warning-icon"><FaExclamationTriangle /></div>
             <h3>No Documents Uploaded</h3>
             <p>This application does not have any documents attached yet.</p>
             <p><strong>Action Required:</strong> Request documents from applicant before approval.</p>
@@ -285,7 +337,7 @@ const ReviewApplication = () => {
 
       {/* Application Timeline / Processing History */}
       <div className="review-section">
-        <h2 className="section-title">📋 Application Timeline</h2>
+        <h2 className="section-title"><FaClipboardList /> Application Timeline</h2>
         <p className="section-subtitle">Complete processing history of this application</p>
         
         <div className="timeline-container">
@@ -309,14 +361,15 @@ const ReviewApplication = () => {
           {application.processingHistory && application.processingHistory.length > 0 ? (
             application.processingHistory.map((event, index) => {
               const getEventIcon = (action) => {
+                const iconStyle = { fontSize: '16px' };
                 switch(action?.toLowerCase()) {
-                  case 'approved': return '✅';
-                  case 'rejected': return '❌';
-                  case 'forwarded': return '➡️';
-                  case 'requested_docs': return '📎';
-                  case 'review_started': return '👁️';
-                  case 'escalated': return '⬆️';
-                  default: return '🔄';
+                  case 'approved': return <FaCheckCircle style={{ ...iconStyle, color: '#0f9d58' }} />;
+                  case 'rejected': return <FaTimesCircle style={{ ...iconStyle, color: '#d93025' }} />;
+                  case 'forwarded': return <FaArrowRight style={{ ...iconStyle, color: '#1976d2' }} />;
+                  case 'requested_docs': return <FaPaperclip style={{ ...iconStyle, color: '#ff9800' }} />;
+                  case 'review_started': return <FaEye style={{ ...iconStyle, color: '#673ab7' }} />;
+                  case 'escalated': return <FaArrowUp style={{ ...iconStyle, color: '#e91e63' }} />;
+                  default: return <FaSync style={{ ...iconStyle, color: '#607d8b' }} />;
                 }
               };
 
@@ -426,7 +479,7 @@ const ReviewApplication = () => {
           <div className="action-buttons">
             <SecondaryButton
               onClick={() => {
-                console.log('🔴 Reject button clicked');
+                console.log('Reject button clicked');
                 handleAction('reject');
               }}
               disabled={actionLoading}
@@ -437,7 +490,7 @@ const ReviewApplication = () => {
             {higherAuthorities.length > 0 && (
               <SecondaryButton
                 onClick={() => {
-                  console.log('🔵 Forward button clicked');
+                  console.log('Forward button clicked');
                   handleAction('forward');
                 }}
                 disabled={actionLoading}
@@ -448,7 +501,7 @@ const ReviewApplication = () => {
             
             <PrimaryButton
               onClick={() => {
-                console.log('🟢 Approve button clicked');
+                console.log('Approve button clicked');
                 handleAction('approve');
               }}
               disabled={actionLoading}
@@ -463,7 +516,7 @@ const ReviewApplication = () => {
       <ConfirmModal
         isOpen={showModal}
         onClose={() => {
-          console.log('❌ Modal cancelled');
+          console.log('Modal cancelled');
           setShowModal(false);
         }}
         onConfirm={confirmAction}

@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { FaFileAlt, FaPaperclip } from 'react-icons/fa';
 import { authorityAPI } from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
@@ -170,7 +171,10 @@ const DataVerificationForm = () => {
       <div className="verification-content">
         {/* Application Details */}
         <div className="details-section">
-          <h2>📄 Application Details</h2>
+          <h2>
+            <FaFileAlt style={{ marginRight: '8px' }} />
+            Application Details
+          </h2>
           
           <div className="detail-grid">
             <div className="detail-item">
@@ -234,7 +238,10 @@ const DataVerificationForm = () => {
                 {application.documents && application.documents.length > 0 ? (
                   application.documents.map((doc, idx) => (
                     <div key={idx} className="document-item">
-                      <span>📎 {doc.type.replace(/_/g, ' ')}</span>
+                      <span>
+                        <FaPaperclip style={{ marginRight: '4px' }} />
+                        {doc.type.replace(/_/g, ' ')}
+                      </span>
                       <span className={`doc-status ${doc.status}`}>{doc.status}</span>
                       {doc.fileUrl && (
                         <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer" className="doc-link">

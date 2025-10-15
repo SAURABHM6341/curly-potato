@@ -276,7 +276,7 @@ UserSchema.statics.createVerifiedUser = async function(userData, mobileOriginal,
   console.log(`   Mobile: ${maskedMobile}`);
   console.log('   ⚠️  Save these credentials for login!');
   
-  return savedUser;
+  return { newUser: savedUser, generatedPassword };
 };
 
 /**

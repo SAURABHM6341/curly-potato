@@ -13,6 +13,7 @@ import PrimaryButton from '../../components/Button/PrimaryButton';
 import SecondaryButton from '../../components/Button/SecondaryButton';
 import { useToast } from '../../context/ToastContext';
 import Spinner from '../../components/Loader/Spinner';
+import { FaFileAlt } from 'react-icons/fa';
 import './SchemeForm.css';
 
 const SchemeForm = () => {
@@ -230,7 +231,7 @@ const SchemeForm = () => {
           <ul className="required-docs-list">
             {scheme.requiredDocs.map((doc, index) => (
               <li key={index} className="required-doc-item">
-                <span className="doc-icon">📄</span>
+                <span className="doc-icon"><FaFileAlt /></span>
                 {doc}
               </li>
             ))}

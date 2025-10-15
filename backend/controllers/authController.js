@@ -433,15 +433,27 @@ class AuthController {
       // Clean up OTP
       OTPManager.cleanupOTP('login', normalizedIdentifier);
 
-      return res.status(200).json({
-        success: true,
-        message: 'Login successful',
-        user: user.getProfile(),
-        session: {
-          loginMethod: 'otp',
-          loginAt: req.session.user.loginAt,
-          expiresAt: req.session.user.expiresAt
+      // Ensure session is saved before responding
+      req.session.save((err) => {
+        if (err) {
+          console.error('OTP login session save error:', err);
+          return res.status(500).json({
+            success: false,
+            error: 'Session creation failed',
+            code: 'SESSION_ERROR'
+          });
         }
+
+        return res.status(200).json({
+          success: true,
+          message: 'Login successful',
+          user: user.getProfile(),
+          session: {
+            loginMethod: 'otp',
+            loginAt: req.session.user.loginAt,
+            expiresAt: req.session.user.expiresAt
+          }
+        });
       });
 
     } catch (error) {
@@ -516,15 +528,27 @@ class AuthController {
       // Update user login stats
       await user.recordLogin();
 
-      return res.status(200).json({
-        success: true,
-        message: 'Login successful',
-        user: user.getProfile(),
-        session: {
-          loginMethod: 'password',
-          loginAt: req.session.user.loginAt,
-          expiresAt: req.session.user.expiresAt
+      // Ensure session is saved before responding
+      req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+          return res.status(500).json({
+            success: false,
+            error: 'Session creation failed',
+            code: 'SESSION_ERROR'
+          });
         }
+
+        return res.status(200).json({
+          success: true,
+          message: 'Login successful',
+          user: user.getProfile(),
+          session: {
+            loginMethod: 'password',
+            loginAt: req.session.user.loginAt,
+            expiresAt: req.session.user.expiresAt
+          }
+        });
       });
 
     } catch (error) {
@@ -647,22 +671,33 @@ class AuthController {
         loginAt: req.session.authority.loginAt
       });
 
-      return res.status(200).json({
-        success: true,
-        message: 'Authority login successful',
-        authority: {
-          authorityId: authority.authorityId,
-          designation: authority.designation,
-          department: authority.department,
-          accessLevel: authority.accessLevel,
-          permissions: authority.permissions,
-          lastLogin: authority.lastLogin
-        },
-        session: {
-          loginAt: req.session.authority.loginAt,
-          expiresAt: req.session.authority.expiresAt,
-          sessionType: 'authority'
+      // Ensure session is saved before responding
+      req.session.save((err) => {
+        if (err) {
+          console.error('Authority session save error:', err);
+          return res.status(500).json({
+            success: false,
+            error: 'Session creation failed',
+            code: 'SESSION_ERROR'
+          });
         }
+
+        return res.status(200).json({
+          success: true,
+          message: 'Authority login successful',
+          authority: {
+            authorityId: authority.authorityId,
+            designation: authority.designation,
+            department: authority.department,
+            accessLevel: authority.accessLevel,
+            permissions: authority.permissions,
+            lastLogin: authority.lastLogin
+          },
+          session: {
+            loginAt: req.session.authority.loginAt,
+            expiresAt: req.session.authority.expiresAt
+          }
+        });
       });
 
     } catch (error) {
@@ -770,7 +805,7 @@ class AuthController {
       const aadhaarHash = CryptoManager.hashAadhaar(cleanAadhaar);
 
       // Create user account in database
-      const newUser = await User.createVerifiedUser(mockAadhaarData, mobile, aadhaarHash);
+      const { newUser, generatedPassword } = await User.createVerifiedUser(mockAadhaarData, mobile, aadhaarHash);
 
       // Generate permanent JWT token for dashboard access
       const permanentToken = JWTManager.generatePermanentToken(newUser);
@@ -784,7 +819,8 @@ class AuthController {
         user: newUser.getProfile(),
         credentials: {
           loginUserId: newUser.loginUserId,
-          message: 'Login credentials have been generated. Check console for password.'
+          password: generatedPassword,
+          message: 'Save these credentials for login'
         },
         accountStatus: {
           isVerified: newUser.isVerified,

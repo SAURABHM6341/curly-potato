@@ -29,8 +29,8 @@ const TrackStatus = () => {
     setLoading(true);
     try {
       const response = await applicationAPI.getApplicationStatus(applicationId);
-      console.log('📊 Application status received:', response.data.application);
-      console.log('📜 Processing chain:', response.data.application.processingChain);
+      console.log('Application status received:', response.data.application);
+      console.log('Processing chain:', response.data.application.processingChain);
       
       // Map processingChain to timeline for compatibility
       const appData = response.data.application;

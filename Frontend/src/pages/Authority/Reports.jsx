@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { authorityAPI } from '../../utils/api';
 import { useToast } from '../../context/ToastContext';
 import Spinner from '../../components/Loader/Spinner';
+import { FaChartBar } from 'react-icons/fa';
 import './Reports.css';
 
 function Reports() {
@@ -29,13 +30,13 @@ function Reports() {
         authorityAPI.getPendingApplications({ status: 'all' }) // Get ALL applications for reports
       ]);
 
-      console.log('📊 Dashboard Response:', dashboardResponse.data);
-      console.log('📋 Applications Response:', applicationsResponse.data);
+      console.log('Dashboard Response:', dashboardResponse.data);
+      console.log('Applications Response:', applicationsResponse.data);
 
       if (dashboardResponse.data.success) {
         // Handle different response structures (dashboard vs statistics)
         const statsData = dashboardResponse.data.statistics || dashboardResponse.data.dashboard?.statistics;
-        console.log('📊 Stats Data:', statsData);
+        console.log('Stats Data:', statsData);
         
         // Convert byStatus array to object for easier access
         if (statsData?.byStatus && Array.isArray(statsData.byStatus)) {
@@ -99,7 +100,7 @@ function Reports() {
         <div className="reports-stats">
           <div className="stats-grid">
             <div className="stat-card">
-              <div className="stat-icon">📊</div>
+              <div className="stat-icon"><FaChartBar /></div>
               <div className="stat-info">
                 <h3>Total Applications</h3>
                 <p className="stat-value">{stats.totalApplications || applications.length || 0}</p>

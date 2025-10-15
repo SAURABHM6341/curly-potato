@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaCheckCircle, FaCopy, FaEye, FaEyeSlash, FaExclamationTriangle } from 'react-icons/fa';
 import { authAPI } from '../../utils/api';
 import TextInput from '../../components/Input/TextInput';
 import OTPInput from '../../components/Input/OTPInput';
@@ -319,7 +320,9 @@ const Signup = () => {
         {step === 5 && credentials && (
           <div className="credentials-container">
             <div className="credentials-success">
-              <div className="credentials-icon">✓</div>
+              <div className="credentials-icon">
+                <FaCheckCircle />
+              </div>
               <h2 className="credentials-title">Account Created Successfully!</h2>
               <p className="credentials-subtitle">
                 Save these credentials securely. You'll need them to login.
@@ -341,7 +344,7 @@ const Signup = () => {
                     onClick={() => handleCopyCredentials(credentials.loginUserId)}
                     className="credential-copy"
                   >
-                    📋
+                    <FaCopy />
                   </button>
                 </div>
               </div>
@@ -351,7 +354,7 @@ const Signup = () => {
                 <div className="credential-value-group">
                   <input
                     type={showPassword ? "text" : "password"}
-                    value={credentials.password || ''}
+                    value={credentials.password || 'Password not available'}
                     readOnly
                     className="credential-value"
                   />
@@ -359,8 +362,9 @@ const Signup = () => {
                     type="button"
                     onClick={() => handleCopyCredentials(credentials.password)}
                     className="credential-copy"
+                    disabled={!credentials.password}
                   >
-                    📋
+                    <FaCopy />
                   </button>
                 </div>
                 <button
@@ -368,13 +372,22 @@ const Signup = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="credential-toggle"
                 >
-                  {showPassword ? '👁️ Hide Password' : '👁️ View Password'}
+                  {showPassword ? (
+                    <>
+                      <FaEyeSlash /> Hide Password
+                    </>
+                  ) : (
+                    <>
+                      <FaEye /> View Password
+                    </>
+                  )}
                 </button>
               </div>
             </div>
 
             <div className="credentials-warning">
-              ⚠️ Please save these credentials. You cannot retrieve them later.
+              <FaExclamationTriangle style={{ marginRight: '8px' }} />
+              Please save these credentials. You cannot retrieve them later.
             </div>
 
             <PrimaryButton onClick={handleGoToLogin} fullWidth>

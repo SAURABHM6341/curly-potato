@@ -6,6 +6,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { FaBuilding, FaUser, FaChartBar, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa';
 import './Layout.css';
 
 const Navbar = () => {
@@ -28,7 +29,7 @@ const Navbar = () => {
       <div className="navbar-container">
         {/* Logo and Title */}
         <div className="navbar-brand" onClick={() => navigate(`/${role}/dashboard`)}>
-          <div className="navbar-logo">🏛️</div>
+          <div className="navbar-logo"><FaBuilding /></div>
           <div className="navbar-title">
             <h1 className="navbar-name">PCR PoA Portal</h1>
             <p className="navbar-subtitle">Direct Benefit Transfer</p>
@@ -59,7 +60,7 @@ const Navbar = () => {
                     setShowDropdown(false);
                   }}
                 >
-                  👤 Profile
+                  <FaUser /> Profile
                 </button>
                 <button
                   className="navbar-dropdown-item"
@@ -68,14 +69,14 @@ const Navbar = () => {
                     setShowDropdown(false);
                   }}
                 >
-                  📊 Dashboard
+                  <FaChartBar /> Dashboard
                 </button>
                 <hr className="navbar-dropdown-divider" />
                 <button
                   className="navbar-dropdown-item navbar-dropdown-logout"
                   onClick={handleLogout}
                 >
-                  🚪 Logout
+                  <FaSignOutAlt /> Logout
                 </button>
               </div>
             )}
@@ -87,7 +88,7 @@ const Navbar = () => {
           className="navbar-mobile-toggle"
           onClick={() => setShowMobileMenu(!showMobileMenu)}
         >
-          {showMobileMenu ? '✕' : '☰'}
+          {showMobileMenu ? <FaTimes /> : <FaBars />}
         </button>
       </div>
 
@@ -109,7 +110,7 @@ const Navbar = () => {
               setShowMobileMenu(false);
             }}
           >
-            👤 Profile
+            <FaUser /> Profile
           </button>
           <button
             className="navbar-mobile-item"
@@ -118,13 +119,13 @@ const Navbar = () => {
               setShowMobileMenu(false);
             }}
           >
-            📊 Dashboard
+            <FaChartBar /> Dashboard
           </button>
           <button
             className="navbar-mobile-item navbar-mobile-logout"
             onClick={handleLogout}
           >
-            🚪 Logout
+            <FaSignOutAlt /> Logout
           </button>
         </div>
       )}

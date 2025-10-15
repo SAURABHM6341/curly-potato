@@ -4,6 +4,7 @@
  */
 
 import React, { useEffect } from 'react';
+import { FaCheckCircle, FaTimesCircle, FaExclamationTriangle, FaTimes } from 'react-icons/fa';
 import './Toast.css';
 
 const Toast = ({ message, type = 'info', onClose, duration = 3000 }) => {
@@ -16,10 +17,10 @@ const Toast = ({ message, type = 'info', onClose, duration = 3000 }) => {
   }, [duration, onClose]);
 
   const icons = {
-    success: '✓',
-    error: '✕',
-    warning: '⚠',
-    info: 'ℹ'
+    success: <FaCheckCircle />,
+    error: <FaTimesCircle />,
+    warning: <FaExclamationTriangle />,
+    info: <FaExclamationTriangle />
   };
 
   return (
@@ -27,7 +28,7 @@ const Toast = ({ message, type = 'info', onClose, duration = 3000 }) => {
       <div className="toast-icon">{icons[type]}</div>
       <div className="toast-message">{message}</div>
       <button className="toast-close" onClick={onClose} aria-label="Close">
-        ×
+        <FaTimes />
       </button>
     </div>
   );
